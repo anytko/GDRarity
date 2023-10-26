@@ -1,0 +1,14 @@
+Package: EcoStatusR
+Title: Classify Ecological Status of Species Varying in Rarity
+Version: 0.0.0.9000
+Imports: Rdpack, ape, dplyr, tidyr, stringr, raster, rgbif, sp, rlist, terra, rgl, magrittr
+RdMacros: Rdpack
+Authors@R: 
+    person("Alivia", "Nytko", , "anytko@vols.utk.edu", role = c("aut", "cre"),
+           comment = c(ORCID = "YOUR-ORCID-ID"))
+Description: Classify the ecological status of species varying in geographic, phylogenetic, and functional rarity. ClassifyRarity uses measures of range size, evolutionary distinctiveness, and functional trait uniqueness to categorize species varying in rarity into one of eight ecological statuses across chosen phylogenetic extent. Ecological status can be used to infer associated organismal strategy. ClassifyRarity gives users the option to utilize their own data or data compiled from the LEDA trait database.
+License: `use_mit_license()`, `use_gpl3_license()` or friends to pick a
+    license
+Encoding: UTF-8
+Roxygen: list(markdown = TRUE)
+RoxygenNote: 7.2.3
