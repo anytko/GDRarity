@@ -1,7 +1,7 @@
-#' Classify Ecological Status
-#' 
-#' Categorize species in a data frame with scaled/transformed data for range size and evolutionary distinctiveness into one of eight ecological statuses.
-#' 
+#' Check Eco Status with K Parameter
+#'
+#' This function categorizes species into eco-evolutionary status based on the provided trait data and custom thresholds based on specified optimal K clusters.
+#'
 #' @param data_frame A data frame containing scaled (typically using the median and median absolute deviation) values of range size, evolutionary distinctiveness, and functional distinctiveness.
 #' 
 #' @param range_size_col A column within the data frame corresponding to the range size (km^2) of the species; should be z transformed (typically using the median and meadian absolute deviation) for ecological status classification. Use the name of the column in "".
@@ -10,20 +10,16 @@
 #' 
 #' @param fun_dist_col A column within the data frame corresponding to the functional distinctivess of the respective species. Use the name of the column in "".
 #' 
+#' @param range_size_K The optimal number of clusters (K) for range size.
 #' 
-#' @details The function categorizes species based on their ecological status, considering three axes of rarity: range size, evolutionary distinctiveness, and functional distinctiveness. Thresholds are set by user input, using optimal K means clustering for each variable. 
+#' @param mean_evol_dist_K The optimal number of clusters (K) for mean evolutionary disctinctiveness.
 #' 
-#' @seealso To determine the optimal K means to utilize here, examine the elbow plot produced using EcoStatusR::elbow_plot(). 
-#' 
-#' @return A data frame with species eco-evoultionary rarity classifications in the "classifications" column.
-#'
-#' @author Alivia G Nytko, \email{anytko@@vols.utk.edu}
-#' 
-#' @seealso Please keep in mind that example values are randomized and therefore not representative of true ecological status.
-#' 
+#' @param fun_dist_K The optimal number of clusters (K) for functional disctinctiveness.
+#' @return A data frame with an additional column "classifications" indicating the ecological status of each species.
 #' @examples
 #' 
 #' Create a dataframe of maple, ash, and pine species with range size, evolutionary distinctiveness, and functional distinctiveness
+#' 
 #' species_names <- c("Abies_alba", "Abies_grandis", "Abies_nordmanniana", "Acer_campestre", "Acer_monspessulanum", "Acer_negundo", "Acer_opalus", "Acer_platanoides", "Acer_pseudoplatanus", "Acer_saccharinum", "Fraxinus_angustifolia", "Fraxinus_excelsior", "Fraxinus_ornus", "Fraxinus_pennsylvanica", "Pinus_banksiana", "Pinus_cembra", "Pinus_nigra", "Pinus_pinaster", "Pinus_pinea", "Pinus_ponderosa", "Pinus_strobus", "Pinus_sylvestris", "Pinus_uncinata")
 #' 
 #' FD_values <- runif(min = -2, max = 2, n=23)
@@ -39,17 +35,16 @@
 #' elbow_plot(forest_data, "mean_evol_dist")
 #' elbow_plot(forest_data, "fun_dist")
 #'
-#' eco_stat <- check_eco_status(data_frame = forest_data, fun_dist = "fun_dist", range_size = "range_size", mean_evol_dist = "mean_evol_dist")
+#' eco_stat <- check_eco_status_k(data_frame = forest_data, fun_dist_col = "fun_dist", range_size_col = "range_size", mean_evol_dist_col = "mean_evol_dist", range_size_k = 3, mean_evol_dist_k = 3, fun_dist_k = 3)
 #' 
 #' print(eco_stat)
-#'
-#' @export 
-#' 
-check_eco_status <- function(data_frame, range_size_col, mean_evol_dist_col, fun_dist_col) {
+#' @export
+
+check_eco_status_k <- function(data_frame, range_size_col, mean_evol_dist_col, fun_dist_col, range_size_k, mean_evol_dist_k, fun_dist_k ) {
   
   
   # Choose optimal K for range size
-  k_range_size <- choose_optimal_k(range_size_col)
+  k_range_size <- range_size_k
   
   # Define custom ranges for range size
   range_size_ranges <- define_custom_k_ranges(data.frame(range_size = data_frame[[range_size_col]]), range_size_col, k_range_size)$custom_ranges
@@ -57,14 +52,14 @@ check_eco_status <- function(data_frame, range_size_col, mean_evol_dist_col, fun
 
   
   # Choose optimal K for mean evolutionary distance
-  k_mean_evol_dist <- choose_optimal_k(mean_evol_dist_col)
+  k_mean_evol_dist <- mean_evol_dist_k
   
   # Define custom ranges for mean evolutionary distance
   mean_evol_dist_ranges <- define_custom_k_ranges(data.frame(mean_evol_dist = data_frame[[mean_evol_dist_col]]), mean_evol_dist_col, k_mean_evol_dist)$custom_ranges
   evol_dist_threshold <- mean_evol_dist_ranges[[length(mean_evol_dist_ranges)]][1]
 
   # Choose optimal K for functional distance
-  k_fun_dist <- choose_optimal_k(fun_dist_col)
+  k_fun_dist <- fun_dist_k
   
   # Define custom ranges for functional distance
   fun_dist_ranges <- define_custom_k_ranges(data.frame(fun_dist = data_frame[[fun_dist_col]]), fun_dist_col, k_fun_dist)$custom_ranges
@@ -120,4 +115,3 @@ check_eco_status <- function(data_frame, range_size_col, mean_evol_dist_col, fun
 
   return(data_frame)
 }
-

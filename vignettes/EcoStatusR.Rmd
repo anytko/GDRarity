@@ -1,0 +1,146 @@
+---
+title: "EcoStatusR"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{EcoStatusR}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+## Vignete Info 
+This vignette provides an introduction to the usage of EcoStatusR. In this vignette, we will use four functional traits (SLA, seed mass, leaf mass, and canopy height) of various tree, shrub, and flower species representative of a potential plant community in the Southeastern U.S. to classify and visualize their respective ecological statuses. 
+
+```{r setup, warning=FALSE, message=FALSE}
+library(EcoStatusR)
+```
+
+```{r other setup, warning=FALSE, message=FALSE, echo=FALSE}
+library(knitr)
+library(DT)
+library(rgl)
+library(tibble)
+options(rgl.useNULL = TRUE)
+```
+
+# Example
+
+## Create Trait Dataframe
+```{r Create Trait Dataframe, results='asis'}
+trait_df <- build_trait_data(columns_to_select = c("SLA", "seed_mass", "leaf_mass", "canopy_height"), genera = c("Acer_", "Pinus_", "Fraxinus_", "Quercus_", "Tsuga_", "Solidago_", "Ulmus", "Populus", "Rhododendron_", "Betula_"))
+
+trait_df <- rownames_to_column(trait_df, var = "species_name")
+DT::datatable(trait_df)
+```
+
+
+## Input Phylogeny
+Users can input their own phylogeny or use one of the four phylogeneies listed in Smith & Brown 2018 including: 
+
+* ALLMB: GenBank and Open Tree of Life taxa with a backbone provided by Magallón et al. 2015
+* ALLOTB: GenBank and Open Tree of Life taxa with a backbone provided by Open Tree of Life version 9.1
+* GBMB: GenBank taxa with a backbone provided by Magallón et al. 2015
+* GBOTB: GenBank taxa with a backbone provided by Open Tree of Life version 9.1"
+
+```{r Input Phylogeny}
+GBMB_phylogeny <- get_phy("GBMB")
+```
+
+
+## Calculate Range Size
+
+```{r Calculate Range Size, results=FALSE, echo=TRUE, message=FALSE}
+trait_range_df <- calc_range_size(data_frame = trait_df, min_points = 4, gbif_limit = 2250, num_cores = 6)
+
+trait_range_df$species_name <- gsub("^\\d+\\.", "", trait_range_df$species_name)
+
+```
+
+```{r Display Range Size Table, echo=FALSE}
+DT::datatable(trait_range_df)
+```
+
+
+## Calculate Evolutionary Distinctiveness
+
+```{r Calculate Evolutionary Distinctiveness, results='asis', message=FALSE, warning=FALSE}
+trait_range_evol_df <- avg_evol_dist(data_frame = trait_range_df, phy = GBMB_phylogeny, time_slices = c(10, 25, 50), num_cores = 6)
+DT::datatable(trait_range_evol_df)
+```
+
+## Calculate Functional Distinctiveness
+In order to calculate functional distinctiveness, we need merge the range size and evolutionary distinctiveness dataframes and remove any species with NA values for any trait. 
+```{r Remove NA, results='asis'}
+
+merged_df <- merge(merge(trait_df, trait_range_df, by = "species_name", all = TRUE), trait_range_evol_df, by = "species_name", all = TRUE)
+
+merged_df <- na.omit(merged_df)
+```
+
+```{r Calculate Functional Distinctiveness, results='asis'}
+fun_evol_range_df <- fun_dist(data_frame = merged_df, trait_columns = c("SLA", "seed_mass", "leaf_mass", "canopy_height"))
+DT::datatable(fun_evol_range_df)
+```
+
+## Z Transform Dataframe 
+
+```{r Z Transform Dataframe, results='asis'}
+z_score_df <- scale_by_median(data_frame = fun_evol_range_df, columns_chosen = c("range_size", "mean_evol_dist"))
+DT::datatable(z_score_df)
+```
+
+## Create Elbow Plots to Detmine Optimal K Means
+### The optimal K means value can be determined by finding the "elbow" or bend in the plot. 
+
+### Range Size Eblow: K = 2
+``` {r Elbow Plot Range Size}
+elbow_plot(data = z_score_df, variable = "range_size", k_max = 5)
+```
+
+### Evolutionary Distinctiveness Eblow: K = 2
+``` {r Elbow Plot Evolutionary Distinctiveness}
+elbow_plot(data = z_score_df, variable = "mean_evol_dist", k_max = 5)
+```
+
+### Functional Distinctiveness Eblow: K = 2
+``` {r Elbow Plot Functional Distinctiveness}
+elbow_plot(data = z_score_df, variable = "fun_dist", k_max = 5)
+```
+
+## Determine Ecological Status
+
+```{r Check Eco Status, results=FALSE, echo=TRUE, message=FALSE}
+eco_stat_df <- check_eco_status_k(data_frame = z_score_df, range_size_col = "range_size", mean_evol_dist_col = "mean_evol_dist", fun_dist_col = "fun_dist", range_size_k = 3, mean_evol_dist_k = 3, fun_dist_k = 3)
+```
+
+```{r Display Eco Status Table, echo=FALSE}
+DT::datatable(eco_stat_df)
+```
+
+## Visualizing Ecological Status 
+
+We can map the ecological statuses of species from the large dataframe onto interactive 3D space. This object can be manipulated and positioned by the user in order to best visualize the respective ecological statuses. 
+
+<style>
+  /* Adjust the dimensions as needed */
+  .rgl-container {
+    width: 600px; /* Change to your preferred width */
+    height: 400px; /* Change to your preferred height */
+  }
+</style>
+
+```{r Create 3d Visualization, out.width="100%", fig.dim = c(6, 6)}
+figure <- plot_eco_status(data_frame = eco_stat_df, fun_dist = "fun_dist", range_size = "range_size", evol_dist = "mean_evol_dist")
+rglwidget()
+```
+
+
+### If a still-image is desired rgl::rgl.snapshot() is recommended.
+
+

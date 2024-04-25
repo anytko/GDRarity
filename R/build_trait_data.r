@@ -1,27 +1,37 @@
-#' Construct Trait Data
+#' Build Trait Data
 #' 
-#' Construct a dataframe of trait data for various plant species of interest using LEDA trait database.
+#' Build a dataframe of trait data for various plant species of interest using LEDA trait database.
 #' 
 #' @param columns_to_select A character vector specifying which traits to select. Options include: SLA (specific leaf area mm^2/mg), seed_mass (mg), leaf_mass (mg), and canopy_height (m)
 #' 
-#' @param order A character vector specifying genera of interest to be filtered. Default is NULL.
+#' @param genera A character vector specifying genera of interest to be filtered. Default is NULL.
 #' 
 #' @details The function reads trait data from four different data files, including SLA (Specific Leaf Area), seed mass, leaf mass, and canopy height. It then combines these data frames into a single data frame based on the species name.
 #' 
-#' @return A dataframe including trait data for all species or species of choice in respective columns titled by trait name.
+#' @return A dataframe including mean trait data for all species or species of choice in respective columns titled by trait name.
 #' 
 #' @import dplyr
 #' @import tidyr
 #' @import stringr
+#' @import purrr
+#' @import tibble
+#' @import utils
+#' @import tibble
 #' 
 #' @author Alivia G Nytko, \email{anytko@@vols.utk.edu}
 #' 
 #' @examples
-#' all_traits <- construct_trait_data(columns_to_select = "SLA")
 #' 
-#' maple_traits <- construct_trait_data(columns_to_select = "seed_mass", order = "Acer_")
+#' Build dataframe using specific leaf area (SLA) trait data across all available species
+#' all_traits <- build_trait_data(columns_to_select = "SLA")
 #' 
-#' tree_traits <- construct_trait_data(columns_to_select = "canopy_height", order = c("Acer_", "Quercus_", "Populus_", "Ulmus_", "Pinus_", "Alnus_", "Betula_", "Salix_", "Abies_", "Fraxinus_", "Tsuga_", "Prunus_",))
+#'Build dataframe using seed mass trait data across maple species
+#' maple_traits <- build_trait_data(columns_to_select = "seed_mass", genera = "Acer_")
+#' print(maple_traits)
+#' 
+#' Build dataframe using canopy height for major tree species
+#' tree_traits <- build_trait_data(columns_to_select = "canopy_height", genera = c("Acer_", "Quercus_", "Populus_", "Ulmus_", "Pinus_", "Alnus_", "Betula_", "Salix_", "Abies_", "Fraxinus_", "Tsuga_", "Prunus_"))
+#' print(tree_traits)
 #' 
 #' @importFrom Rdpack reprompt
 #' 
@@ -30,7 +40,7 @@
 #' 
 #' @export 
 #' 
-construct_trait_data <- function(columns_to_select, genera = NULL) {
+build_trait_data <- function(columns_to_select, genera = NULL) {
   SLA <- read.delim("https://uol.de/f/5/inst/biologie/ag/landeco/download/LEDA/Data_files/SLA_und_geo_neu2.txt", skip=4, sep=';', colClasses = c(general.method="NULL", sample.size="NULL", valid="NULL", leaf.specific.method="NULL", reference="NULL", SBS.number="NULL", original.reference="NULL", country="NULL", UTM.zone="NULL", UTM.easting="NULL", UTM.northing="NULL", mean.SLA..mm.2.mg.="NULL", maximum.SLA..mm.2.mg.="NULL", minimum.SLA..mm.2.mg.="NULL", number.of.replicates="NULL", standard.deviation="NULL", standard.error="NULL", balance.error..mg.="NULL", collection.date="NULL", general.comment="NULL", plant.stage="NULL", X="NULL"), col.names = c("species", "general.method", "SLA", "sample.size", "valid", "leaf.specific.method", "reference", "SBS.number", "original.reference", "country", "UTM.zone", "UTM.easting", "UTM.northing", "mean.SLA..mm.2.mg.", "maximum.SLA..mm.2.mg.", "minimum.SLA..mm.2.mg.", "number.of.replicates", "standard.deviation", "standard.error", "balance.error..mg.", "collection.date", "general.comment", "plant.stage", "X"))
 
   seed_mass <- read.delim("https://uol.de/f/5/inst/biologie/ag/landeco/download/LEDA/Data_files/seed_mass.txt", skip=3, sep=';', colClasses = c(SBS.number="NULL", general.method="NULL", diaspore.type="NULL", sample.size="NULL", valid="NULL", median="NULL", reference="NULL", mean.SM..mg.="NULL", maximum.SM..mg.="NULL", minimum.SM..mg.="NULL", number.of.replicates="NULL", general.comment="NULL", Drying.method="NULL", original.reference="NULL", diaspore.type.code="NULL"), col.names= c("species", "SBS.number", "general.method", "diaspore.type", "seed_mass", "sample.size", "valid", "median", "reference", "mean.SM..mg.", "maximum.SM..mg.", "minimum.SM..mg.", "number.of.replicates", "general.comment", "Drying.method", "original.reference", "diaspore.type.code"))
@@ -62,3 +72,5 @@ construct_trait_data <- function(columns_to_select, genera = NULL) {
   View(result)
   return(result)
 }
+
+
