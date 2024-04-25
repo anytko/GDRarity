@@ -1,6 +1,4 @@
 ---
-title: README
-output: github_document
 ---
 
 <!-- README.md is generated from README.Rmd. Please edit that file -->
@@ -55,7 +53,7 @@ organismal strategy.
 You can install the development version of EcoStatusR like so:
 
 ``` r
-# FILL THIS IN! HOW CAN PEOPLE INSTALL YOUR DEV PACKAGE?
+devtools::install_github("anytko/EcoStatusR")
 ```
 
 ## Example
@@ -67,6 +65,7 @@ how you can determine the ecological status of common tree genera using SLA, see
 library(EcoStatusR)
 ```
 
+## Create Trait Dataframe
 ``` {r Create Trait Dataframe, results='asis'}
 trait_df <- build_trait_data(columns_to_select = c("SLA", "seed_mass", "canopy_height"), genera = c("Acer_", "Pinus_", "Fraxinus_", "Quercus_", "Tsuga_", "Ulmus", "Populus", "Betula_"))
 
@@ -92,9 +91,6 @@ trait_range_df <- calc_range_size(data_frame = trait_df, num_cores = 6, gbif_lim
 trait_range_df$species_name <- gsub("^\\d+\\.", "", trait_range_df$species_name)
 ```
 
-```{r Display Range Size Table, echo=FALSE}
-DT::datatable(trait_range_df)
-```
 
 ## Plot Range Polygons
 ### Plot the range polygons of a species from the table above: Acer campestre
@@ -110,7 +106,6 @@ range_poly_map(data_frame = acer_campestre_range)
 
 ``` {r Calculate Average Evolutionary Distinctiveness, results='asis', message=FALSE, warning=FALSE}
 trait_range_evol_df <- avg_evol_dist(phy = GBMB_phylogeny, data_frame = trait_range_df, num_cores = 6, time_slices = c(5, 10, 20, 35))
-DT::datatable(trait_range_evol_df)
 ```
 
 ## Calculate Functional Distinctiveness
@@ -119,7 +114,6 @@ In order to calculate functional distinctiveness, we need to remove any species 
 merged_df <- merge(merge(trait_df, trait_range_df, by = "species_name", all = TRUE), trait_range_evol_df, by = "species_name", all = TRUE)
 
 merged_df <- na.omit(merged_df)
-DT::datatable(merged_df)
 ```
 
 ``` {r Calculate Functional Distinctiveness, results='asis'}
@@ -156,9 +150,6 @@ fun_dist_elbow_plot <- elbow_plot(data = scaled_df, variable = "fun_dist")
 eco_stat_df <- check_eco_status_k(data_frame = scaled_df, range_size_col = "range_size", mean_evol_dist_col = "mean_evol_dist", fun_dist_col = "fun_dist", range_size_k = 3, mean_evol_dist_k = 3, fun_dist_k = 3)
 ```
 
-```{r Display Eco Status Table, echo=FALSE}
-DT::datatable(eco_stat_df)
-```
 
 
 ## Visualizing Ecological Status 
@@ -168,7 +159,6 @@ We can map the ecological statuses of species from this dataframe onto interacti
 
 ``` {r Create 3d Visualization, out.width="100%", fig.dim = c(6, 6), fig.show='hide'}
 figure <- plot_eco_status(data_frame = eco_stat_df, fun_dist = "fun_dist", evol_dist = "mean_evol_dist", range_size = "range_size")
-rglwidget()
 ```
 
 

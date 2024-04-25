@@ -1,6 +1,4 @@
 ---
-title: README
-output: github_document
 ---
 
 <!-- README.md is generated from README.Rmd. Please edit that file -->
@@ -46,7 +44,7 @@ organismal strategy.
 You can install the development version of EcoStatusR like so:
 
 ``` r
-# FILL THIS IN! HOW CAN PEOPLE INSTALL YOUR DEV PACKAGE?
+devtools::install_github("anytko/EcoStatusR")
 ```
 
 ## Example
@@ -59,6 +57,7 @@ how you can determine the ecological status of common tree genera using SLA, see
 library(EcoStatusR)
 ```
 
+## Create Trait Dataframe
 
 ```r
 trait_df <- build_trait_data(columns_to_select = c("SLA", "seed_mass", "canopy_height"), genera = c("Acer_", "Pinus_", "Fraxinus_", "Quercus_", "Tsuga_", "Ulmus", "Populus", "Betula_"))
@@ -90,11 +89,6 @@ trait_range_df$species_name <- gsub("^\\d+\\.", "", trait_range_df$species_name)
 ```
 
 
-```
-#> PhantomJS not found. You can install it with webshot::install_phantomjs(). If it is installed, please make sure the phantomjs executable can be found via the PATH variable.
-#> Error in path.expand(path): invalid 'path' argument
-```
-
 ## Plot Range Polygons
 ### Plot the range polygons of a species from the table above: Acer campestre
 
@@ -110,8 +104,6 @@ range_poly_map(data_frame = acer_campestre_range)
 
 ```r
 trait_range_evol_df <- avg_evol_dist(phy = GBMB_phylogeny, data_frame = trait_range_df, num_cores = 6, time_slices = c(5, 10, 20, 35))
-DT::datatable(trait_range_evol_df)
-#> Error in path.expand(path): invalid 'path' argument
 ```
 
 ## Calculate Functional Distinctiveness
@@ -121,9 +113,6 @@ In order to calculate functional distinctiveness, we need to remove any species 
 merged_df <- merge(merge(trait_df, trait_range_df, by = "species_name", all = TRUE), trait_range_evol_df, by = "species_name", all = TRUE)
 
 merged_df <- na.omit(merged_df)
-DT::datatable(merged_df)
-#> PhantomJS not found. You can install it with webshot::install_phantomjs(). If it is installed, please make sure the phantomjs executable can be found via the PATH variable.
-#> Error in path.expand(path): invalid 'path' argument
 ```
 
 
@@ -179,11 +168,6 @@ eco_stat_df <- check_eco_status_k(data_frame = scaled_df, range_size_col = "rang
 ```
 
 
-```
-#> PhantomJS not found. You can install it with webshot::install_phantomjs(). If it is installed, please make sure the phantomjs executable can be found via the PATH variable.
-#> Error in path.expand(path): invalid 'path' argument
-```
-
 
 ## Visualizing Ecological Status 
 
@@ -193,10 +177,6 @@ We can map the ecological statuses of species from this dataframe onto interacti
 
 ```r
 figure <- plot_eco_status(data_frame = eco_stat_df, fun_dist = "fun_dist", evol_dist = "mean_evol_dist", range_size = "range_size")
-rglwidget()
-#> Warning in snapshot3d(scene = x, width = width, height = height): webshot =
-#> TRUE requires the webshot2 package and Chrome browser; using rgl.snapshot()
-#> instead
 ```
 
 
