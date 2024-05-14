@@ -11,6 +11,7 @@
 #' @import rgbif
 #' @import sf
 #' @import dbscan
+#' @import dplyr
 #' 
 #' @examples 
 #' data <- data.frame(species_name = c("Quercus alba"))
