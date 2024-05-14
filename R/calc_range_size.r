@@ -51,7 +51,7 @@
 #' Subset the pine species from the dataframe and use calculate_range_size. Adjust the minimum distance to form a dbscan neighborhood to 1.25 unit latitude/longitude and the maximum gbif occurences to 2500:
 #' 
 #' range_size_pinus <- calc_range_size(data_frame = tree_data, species_name = c("Pinus_banksiana", "Pinus_cembra", "Pinus_nigra", "Pinus_pinaster", "Pinus_pinea", "Pinus_ponderosa", "Pinus_strobus", "Pinus_sylvestris", "Pinus_uncinata"), num_cores = 6, min_distance = 1.25, gbif_limit = 2500) 
-
+#'
 #' print(range_size_pinus) 
 #' 
 #' @importFrom Rdpack reprompt
@@ -79,6 +79,7 @@ calc_range_size <- function(data_frame, species_name = NULL, num_cores = 1, min_
       library(sf)
       library(dbscan)
       library(rgbif)
+      library(rmapshaper)
     })
   } else {
     species_chunks <- list(species_names)
@@ -127,7 +128,7 @@ calc_range_size <- function(data_frame, species_name = NULL, num_cores = 1, min_
           message(paste("No data left after filtering for", cleaned_species_name))
           range_size <- NA
         } else {
-          gbif_sf <- st_as_sf(gbif_data$data, coords = c("decimalLongitude", "decimalLatitude"))
+          gbif_sf <- st_as_sf(gbif_data$data, coords = c("decimalLongitude", "decimalLatitude"), crs = 4326)
           gbif_coords <- st_coordinates(gbif_sf)
           gbif_coords <- as.data.frame(gbif_coords)
           cluster_result <- dbscan(gbif_coords, eps = min_distance, minPts = min_points)
@@ -149,8 +150,12 @@ calc_range_size <- function(data_frame, species_name = NULL, num_cores = 1, min_
             st_convex_hull(merged_data)
           })
 
+          continent_bounds <- get_continent_sf("https://d2ad6b4ur7yvpq.cloudfront.net/naturalearth-3.3.0/ne_50m_admin_0_countries.geojson")
+
+          convex_hulls_new_list <- clip_polygons_to_land(convex_hulls_list, continent_bounds)
+
           # Calculate areas for all clusters except cluster 0
-          areas <- sapply(convex_hulls_list, function(ch) {
+          areas <- sapply(convex_hulls_new_list, function(ch) {
             st_area(ch) / 1e6  # Convert to square kilometers
           })
 
@@ -182,8 +187,7 @@ calc_range_size <- function(data_frame, species_name = NULL, num_cores = 1, min_
   rownames(result_df) <- NULL
 
   return(result_df)
-}
-
+} 
 
 
 
