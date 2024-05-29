@@ -99,7 +99,7 @@ calc_range_size <- function(data_frame, species_name = NULL, num_cores = 1, min_
         hasCoordinate = TRUE,
         limit = gbif_limit
       )
-
+      
       if (length(gbif_data$data) == 0) {
         message(paste("No data found for", cleaned_species_name))
         range_size <- NA
@@ -150,21 +150,46 @@ calc_range_size <- function(data_frame, species_name = NULL, num_cores = 1, min_
             st_convex_hull(merged_data)
           })
 
+          convex_hulls_list <- lapply(convex_hulls_list, function(x) {
+            if (st_geometry_type(x) %in% c("POLYGON", "MULTIPOLYGON")) {
+              return(x)
+            } else {
+              return(NULL)
+            }
+          })
+
+          # Remove NULL elements from convex_hulls_list
+          convex_hulls_list <- convex_hulls_list[!sapply(convex_hulls_list, is.null)]
+
           continent_bounds <- get_continent_sf("https://d2ad6b4ur7yvpq.cloudfront.net/naturalearth-3.3.0/ne_50m_admin_0_countries.geojson")
 
           convex_hulls_new_list <- clip_polygons_to_land(convex_hulls_list, continent_bounds)
 
-          # Calculate areas for all clusters except cluster 0
+          # Attempt to calculate areas for all clusters except cluster 0
           areas <- sapply(convex_hulls_new_list, function(ch) {
-            st_area(ch) / 1e6  # Convert to square kilometers
+            tryCatch(
+              {
+                st_area(ch) / 1e6  # Convert to square kilometers
+              },
+              error = function(e) {
+                # If error occurs, recreate convex hulls with buffer of 0
+                convex_hulls_list <- lapply(convex_hulls_list, function(x) {
+                  if (st_geometry_type(x) %in% c("POLYGON", "MULTIPOLYGON")) {
+                    x <- st_buffer(x, dist = 0)
+                    return(x)
+                  } else {
+                    return(NULL)
+                  }
+                })
+                convex_hulls_new_list <- clip_polygons_to_land(convex_hulls_list, continent_bounds)
+                return(0)  # Set area to 0
+              }
+            )
           })
 
           # Calculate range size for species
-          if (length(areas) == 0) {
-            range_size <- 0  # Set to a non-zero value for species with one cluster
-          } else {
-            range_size <- sum(areas)
-          }
+          range_size <- sum(areas)
+
         }
 
         chunk_result[[cleaned_species_name]] <- range_size
@@ -187,7 +212,5 @@ calc_range_size <- function(data_frame, species_name = NULL, num_cores = 1, min_
   rownames(result_df) <- NULL
 
   return(result_df)
-} 
-
-
+}
 

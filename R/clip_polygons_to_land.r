@@ -10,21 +10,22 @@
 #' @export
 
 clip_polygons_to_land <- function(polygons_list, continent_sf) {
-  # Check if the input is NULL
   if (is.null(polygons_list) || length(polygons_list) == 0) {
     return(NULL)
   }
   
   clipped_polygons_list <- lapply(polygons_list, function(convex_hull) {
-    # Convert convex_hull to an sf object if not already
     if (!inherits(convex_hull, "sf")) {
       convex_hull <- st_as_sf(convex_hull)
     }
     
-    # Perform the clipping operation
-    land_polygons <- ms_clip(convex_hull, continent_sf)
+    land_polygons <- tryCatch({
+      ms_clip(convex_hull, continent_sf)
+    }, error = function(e) {
+      message("Error in ms_clip: ", e)
+      return(NULL)
+    })
     
-    # Ensure validity and clean the geometry
     if (!is.null(land_polygons) && length(land_polygons) > 0) {
       valid_polygons <- st_make_valid(land_polygons)
       if (st_is_empty(valid_polygons)) {
@@ -37,7 +38,6 @@ clip_polygons_to_land <- function(polygons_list, continent_sf) {
     }
   })
   
-  # Filter out NULL results
   clipped_polygons_list <- Filter(Negate(is.null), clipped_polygons_list)
   
   return(clipped_polygons_list)
