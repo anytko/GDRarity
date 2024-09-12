@@ -1,12 +1,12 @@
-Package: EcoStatusR
-Title: Analysis of Ecological and Evolutionary Status
+Package: GeoFunPhy
+Title: Analysis of Ecological and Evolutionary Rarity Status
 Version: 0.0.0.9000
 Imports: Rdpack, ape, dplyr, tidyr, stringr, rgbif, rgl, magrittr, purrr, treeio, vegan, datasets, base, dbscan, foreach, doParallel, sf, tibble, utils
 RdMacros: Rdpack
 Authors@R: 
     person("Alivia", "Nytko", , "anytko@vols.utk.edu", role = c("aut", "cre"),
            comment = c(ORCID = "0000-0003-4499-4839"))
-Description: EcoStatusR calculates measures of range size, evolutionary distinctiveness, and functional trait distinctiveness to classify the ecological status of species varying in geographic, phylogenetic, and functional rarity. Ecological status can be used to infer associated organismal strategy. EcoStatus also allows users to utilize their own data to determine the ecological status of species of interest.
+Description: EcoStatusR calculates measures of range size, evolutionary distinctiveness, and functional trait distinctiveness to classify the eco-evolutionary rarity status of species. Ecological status can be used to infer associated organismal strategy. GeoFunPhy also allows users to utilize their own data to determine the ecological status of species of interest.
 License: GPL (>= 3)
 Encoding: UTF-8
 Roxygen: list(markdown = TRUE)

@@ -119,8 +119,3 @@ avg_evol_dist <- function(phy, data_frame, taxon = NULL, time_slices = c(25, 50,
 
 
 
-
-
-
-
-

@@ -1,4 +1,4 @@
-#' Define Custom Ranges
+#' Define Custom K Ranges
 #' 
 #' Perform k-means clustering on a variable and define custom ranges based on cluster centers.
 #' 

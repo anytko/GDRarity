@@ -16,27 +16,27 @@ range_poly_map(
 \arguments{
 \item{species_name}{A character vector of species names.}
 
-\item{min_points}{Minimum number of points to form a cluster using dbscan.}
+\item{min_points}{The minimum number of points required to form a range cluster. Default is 5.}
 
-\item{min_distance}{Minimum distance between points in the same cluster.}
+\item{min_distance}{The minimum distance between points in a range cluster. Default is 1 epsilon (eps).}
 
-\item{gbif_limit}{Maximum number of records to fetch from GBIF.}
+\item{gbif_limit}{The maximum number of GBIF records to retrieve per species. Default is 2000.}
 
 \item{plot}{Logical indicating whether to plot the convex hulls on a map.}
 }
 \value{
-A list of convex hulls for each species, or NULL if no data is found.
+A leaflet map of species range polygons.
 }
 \description{
 Plot range polygons on world map
 }
 \details{
-This function combines the functionality of EcoStatusR::create_range_polygons() and EcoStatusR::plot_convex_hulls(). Specifcally this function creates convex hulls for species using occurence data and plots them onto a world leaflet map.
+This function combines the functionality of EcoStatusR::create_range_polygons() and EcoStatusR::plot_convex_hulls(). Specifcally this function creates convex hulls for species using occurence data from GBIF and plots them onto a world leaflet map.
 }
 \examples{
 
-data <- data.frame(species_name = c("Quercus alba"))
+oak_data <- data.frame(species_name = c("Quercus alba", "Quercus rubra"))
 
-range_poly_map(data_frame = data)
+range_poly_map(data_frame = oak_data)
 
 }

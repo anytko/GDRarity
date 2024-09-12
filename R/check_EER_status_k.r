@@ -1,4 +1,4 @@
-#' Check Eco Status with K Parameter
+#' Check Eco-Evolutionary Rarity (EER) Status with K Parameter
 #'
 #' This function categorizes species into eco-evolutionary status based on the provided trait data and custom thresholds based on specified optimal K clusters.
 #'
@@ -35,12 +35,12 @@
 #' elbow_plot(forest_data, "mean_evol_dist")
 #' elbow_plot(forest_data, "fun_dist")
 #'
-#' eco_stat <- check_eco_status_k(data_frame = forest_data, fun_dist_col = "fun_dist", range_size_col = "range_size", mean_evol_dist_col = "mean_evol_dist", range_size_k = 3, mean_evol_dist_k = 3, fun_dist_k = 3)
+#' eco_stat <- check_EER_status_k(data_frame = forest_data, fun_dist_col = "fun_dist", range_size_col = "range_size", mean_evol_dist_col = "mean_evol_dist", range_size_k = 3, mean_evol_dist_k = 3, fun_dist_k = 3)
 #' 
 #' print(eco_stat)
 #' @export
 
-check_eco_status_k <- function(data_frame, range_size_col, mean_evol_dist_col, fun_dist_col, range_size_k, mean_evol_dist_k, fun_dist_k ) {
+check_EER_status_k <- function(data_frame, range_size_col, mean_evol_dist_col, fun_dist_col, range_size_k, mean_evol_dist_k, fun_dist_k ) {
   
   
   # Choose optimal K for range size

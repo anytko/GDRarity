@@ -22,7 +22,7 @@
 #' 
 #' @examples
 #' 
-#' Create dataframe including species names, range size, evolutionary distinctiveness, functional distinctiveness, and their respective eco-evolutionary classifications
+#' # Create dataframe including species names, range size, evolutionary distinctiveness, functional distinctiveness, and their respective eco-evolutionary classifications
 #' 
 #' species_names <- c("Acer_campestre", "Acer_monspessulanum", "Acer_negundo", "Acer_opalus", "Acer_platanoides", "Acer_pseudoplatanus", "Acer_saccharinum")
 #' FD_values <- runif(min = -2, max = 2, n=7)
@@ -32,12 +32,12 @@
 #'
 #' maple_data_figure <- data.frame(species_name = species_names, fun_dist = FD_values, range_size = range_values, evol_dist = evol_dist_values, classifications = classification)
 #' 
-#' Plot the species' classifications in 3D space
-#' interactive_plot <- plot_eco_status(data_frame = maple_data_figure, fun_dist = fun_dist, range_size = range_size, evol_dist = evol_dist)
+#' # Plot the species' classifications in 3D space
+#' interactive_plot <- plot_EER_status(data_frame = maple_data_figure, fun_dist = "fun_dist", range_size = "range_size", evol_dist = "evol_dist")
 #' 
 #' @export 
 #'
-plot_eco_status <- function(data_frame, fun_dist, evol_dist, range_size) {
+plot_EER_status <- function(data_frame, fun_dist, evol_dist, range_size) {
   if (!fun_dist %in% colnames(data_frame)) {
     stop("Functional distinctiveness not found in the dataframe.")
   }

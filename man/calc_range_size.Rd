@@ -2,67 +2,41 @@
 % Please edit documentation in R/calc_range_size.r
 \name{calc_range_size}
 \alias{calc_range_size}
-\title{Calculate Range Size}
+\title{Calculate range sizes for multiple species}
 \usage{
 calc_range_size(
   data_frame,
-  species_name = NULL,
   num_cores = 1,
   min_points = 5,
   min_distance = 1,
-  gbif_limit = 2000
+  gbif_limit = 2000,
+  continent_file = NULL
 )
 }
 \arguments{
-\item{data_frame}{A data frame containing species data. Input data frame must include a column named "species_name".}
+\item{data_frame}{A \code{data.frame} containing scienfic names of species with a column named \code{species_name}.}
 
-\item{species_name}{A character vector specifying the species names to calculate range sizes. Default is NULL.}
+\item{num_cores}{The number of cores to use for parallel processing. Default is 1 (no parallel processing).}
 
-\item{num_cores}{Number of CPU cores to use for parallel processing. Default is 1. We recommend utilizing as many cores as possible.}
+\item{min_points}{The minimum number of points required to form a range cluster. Default is 5.}
 
-\item{min_points}{The minimum number of points required to form a cluster in DBSCAN. Default is 5.}
+\item{min_distance}{The minimum distance between points in a range cluster. Default is 1 epsilon (eps).}
 
-\item{min_distance}{The maximum distance between points to be considered as neighbors in DBSCAN. Default is 1 unit (1 degree latitude or longitude).}
+\item{gbif_limit}{The maximum number of GBIF records to retrieve per species. Default is 2000.}
 
-\item{gbif_limit}{The maximum number of occurrences to retrieve from GBIF. Default is 2000. We recommend utilizing a high number of occurences for the best estimate of range size; however, higher gbif_limits will increase computing time.}
+\item{continent_file}{The URL of a GeoJSON or shape (.shp & .shx) file containing country or continent data. Default is NULL - If \code{NULL}, a GeoJSON file from Natural Earth will be used.}
 }
 \value{
-A data frame containing species data with an additional 'range_size' column.
+A \code{data.frame} with two columns: \code{species_name} and \code{range_size}. The \code{range_size} column represents the size of the range for each species in square kilometers.
 }
 \description{
-Calculate the range size of species within a dataframe using global GBIF occurence data.
-}
-\details{
-The function calculates the range size for each species in the provided data frame using data from the Global Biodiversity Information Facility (GBIF). It retrieves occurrence data for each species, creates neighborhood polygons (using dbscan), and calculates the range size (using SF) of the polygons for each species in square kilometers. The function allows for specifying the species for which to calculate range size (via the "species_name" argument) or calculates it for all species in the data frame if not specified.
+This function calculates the range sizes (sq km) of multiple species by retrieving occurrence data from GBIF, generating convex hulls, and clipping them to continent boundaries. It uses parallel processing to handle multiple species efficiently.
 }
 \examples{
+# Generate a test dataframe with species Abies cephalonica
+test_data <- data.frame(species_name = c("Abies_cephalonica"))
 
-Identify species of interest:
-
-species_name <- c("Abies_alba", "Abies_grandis", "Abies_nordmanniana", "Acer_campestre", "Acer_monspessulanum", "Acer_negundo", "Acer_opalus", "Acer_platanoides", "Acer_pseudoplatanus", "Acer_saccharinum", "Fraxinus_angustifolia", "Fraxinus_excelsior", "Fraxinus_ornus", "Fraxinus_pennsylvanica", "Pinus_banksiana", "Pinus_cembra", "Pinus_nigra", "Pinus_pinaster", "Pinus_pinea", "Pinus_ponderosa", "Pinus_strobus", "Pinus_sylvestris", "Pinus_uncinata")
-
-Create dataframe with these species:
-
-tree_data <- data.frame(species_name)
-
-Run create_range_size function on this dataframe:
-
-range_size_all <- calc_range_size(data_frame = tree_data, num_cores = 6)
-
-print(range_size_all)
-
-Subset the maple species from the dataframe and use calculate_range_size. Adjust the minimum points forming a dbscan neighborhood to 4:
-
-range_size_maple <- calc_range_size(data_frame = tree_data, species_name = c("Acer_campestre", "Acer_monspessulanum", "Acer_negundo", "Acer_opalus", "Acer_platanoides", "Acer_pseudoplatanus", "Acer_saccharinum"), num_cores = 6, min_points = 4)
-
-print(range_size_maple)
-
-Subset the pine species from the dataframe and use calculate_range_size. Adjust the minimum distance to form a dbscan neighborhood to 1.25 unit latitude/longitude and the maximum gbif occurences to 2500:
-
-range_size_pinus <- calc_range_size(data_frame = tree_data, species_name = c("Pinus_banksiana", "Pinus_cembra", "Pinus_nigra", "Pinus_pinaster", "Pinus_pinea", "Pinus_ponderosa", "Pinus_strobus", "Pinus_sylvestris", "Pinus_uncinata"), num_cores = 6, min_distance = 1.25, gbif_limit = 2500) 
-print(range_size_pinus) 
-
-}
-\author{
-Alivia G Nytko, \email{anytko@vols.utk.edu}
+# Generate range sizes for each speices
+range_size <- calc_range_size(data_frame = test_data)
+print(range_size)
 }

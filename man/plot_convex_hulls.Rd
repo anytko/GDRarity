@@ -16,8 +16,8 @@ Plot convex hulls on map
 This function plots a list of (polygon) convex hulls onto a world leaflet map.
 }
 \examples{
-data <- data.frame(species_name = c("Quercus alba"))
-oak_convex_hulls <- create_range_polygons(data)
-plot_convex_hulls(convex_hulls = oak_convex_hulls)
+data <- data.frame(species_name = c("Eucalyptus gunnii", "Eucalyptus tenuiramis", "Eucalyptus globulus"))
+euc_convex_hulls <- get_range_convex_hulls(data)
+plot_convex_hulls(convex_hulls = euc_convex_hulls)
 
 }
