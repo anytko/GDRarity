@@ -1,8 +1,8 @@
 ---
-title: "EcoStatusR"
+title: "GeoFunPhy"
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{EcoStatusR}
+  %\VignetteIndexEntry{GeoFunPhy}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
@@ -15,10 +15,12 @@ knitr::opts_chunk$set(
 ```
 
 ## Vignete Info 
-This vignette provides an introduction to the usage of EcoStatusR. In this vignette, we will use four functional traits (SLA, seed mass, leaf mass, and canopy height) of various tree, shrub, and flower species representative of a potential plant community in the Southeastern U.S. to classify and visualize their respective ecological statuses. 
+This vignette provides an introduction to the usage of GeoFunPhy. In this vignette, we will use four functional traits (SLA, seed mass, leaf mass, and canopy height) of various tree, shrub, and flower species representative of a potential plant community in the Southeastern U.S. to classify and visualize their respective ecological statuses. 
+
+This vignette will feature how to caluclate species range sizes step-by-step as well as how to use the function calc_range_size() to perform calculations in one step.
 
 ```{r setup, warning=FALSE, message=FALSE}
-library(EcoStatusR)
+library(GeoFunPhy)
 ```
 
 ```{r other setup, warning=FALSE, message=FALSE, echo=FALSE}
@@ -52,33 +54,57 @@ Users can input their own phylogeny or use one of the four phylogeneies listed i
 GBMB_phylogeny <- get_phy("GBMB")
 ```
 
-
-## Calculate Range Size
-
-```{r Calculate Range Size, results=FALSE, echo=TRUE, message=FALSE}
-trait_range_df <- calc_range_size(data_frame = trait_df, min_points = 4, gbif_limit = 2250, num_cores = 6)
-
-trait_range_df$species_name <- gsub("^\\d+\\.", "", trait_range_df$species_name)
-
+## Calculate Range Size *one step
+```{r Calculate Range Sizes, results=FALSE, echo=TRUE, message=FALSE}
+species_range_size <- calc_range_size(data_frame = trait_df, min_points = 4, gbif_limit = 2250, num_cores = 1)
 ```
 
 ```{r Display Range Size Table, echo=FALSE}
-DT::datatable(trait_range_df)
+DT::datatable(species_range_size)
+```
+
+## Calculate Range Size *step-by-step
+
+### Generate range convex hulls
+```{r Generate Range Convex Hulls, results=FALSE, echo=TRUE, message=FALSE}
+convex_hulls <- get_range_convex_hulls(data_frame = trait_df, min_points = 4, gbif_limit = 2250, num_cores = 1)
+```
+
+
+### Read in a continent GeoJSON 
+```{r Get Continent SF, results=FALSE, echo=TRUE, message=FALSE}
+continent_bounds <- get_continent_sf(url = "https://d2ad6b4ur7yvpq.cloudfront.net/naturalearth-3.3.0/ne_50m_admin_0_countries.geojson")
+```
+
+### Clip range convex hulls to continent continent_bounds
+```{r Clip Convex Hulls, results=FALSE, echo=TRUE, message=FALSE}
+clipped_hulls <- clip_polygons_to_land(polygons_list = convex_hulls, continent_sf = continent_bounds)
+```
+
+
+### Calculate the range sizes of these clipped convex hulls
+```{r Calculate Range Sizes of Clipped Convex Hulls, results=FALSE, echo=TRUE, message=FALSE}
+range_sizes_step <- range_sizes(clipped_hulls)
+```
+
+
+```{r Display Range Size Table Step, echo=FALSE}
+DT::datatable(range_sizes_step)
 ```
 
 
 ## Calculate Evolutionary Distinctiveness
 
 ```{r Calculate Evolutionary Distinctiveness, results='asis', message=FALSE, warning=FALSE}
-trait_range_evol_df <- avg_evol_dist(data_frame = trait_range_df, phy = GBMB_phylogeny, time_slices = c(10, 25, 50), num_cores = 6)
-DT::datatable(trait_range_evol_df)
+evol_df <- avg_evol_dist(data_frame = trait_df, phy = GBMB_phylogeny, time_slices = c(10, 25, 50), num_cores = 6)
+DT::datatable(evol_df)
 ```
 
 ## Calculate Functional Distinctiveness
 In order to calculate functional distinctiveness, we need merge the range size and evolutionary distinctiveness dataframes and remove any species with NA values for any trait. 
 ```{r Remove NA, results='asis'}
 
-merged_df <- merge(merge(trait_df, trait_range_df, by = "species_name", all = TRUE), trait_range_evol_df, by = "species_name", all = TRUE)
+merged_df <- merge(merge(trait_df, species_range_size, by = "species_name", all = TRUE), evol_df, by = "species_name", all = TRUE)
 
 merged_df <- na.omit(merged_df)
 ```
@@ -113,17 +139,17 @@ elbow_plot(data = z_score_df, variable = "mean_evol_dist", k_max = 5)
 elbow_plot(data = z_score_df, variable = "fun_dist", k_max = 5)
 ```
 
-## Determine Ecological Status
+## Determine Eco-evolutionary Rarity Status
 
-```{r Check Eco Status, results=FALSE, echo=TRUE, message=FALSE}
-eco_stat_df <- check_eco_status_k(data_frame = z_score_df, range_size_col = "range_size", mean_evol_dist_col = "mean_evol_dist", fun_dist_col = "fun_dist", range_size_k = 3, mean_evol_dist_k = 3, fun_dist_k = 3)
+```{r Check EER Status, results=FALSE, echo=TRUE, message=FALSE}
+EER_stat_df <- check_EER_status_k(data_frame = z_score_df, range_size_col = "range_size", mean_evol_dist_col = "mean_evol_dist", fun_dist_col = "fun_dist", range_size_k = 3, mean_evol_dist_k = 2, fun_dist_k = 2)
 ```
 
-```{r Display Eco Status Table, echo=FALSE}
-DT::datatable(eco_stat_df)
+```{r Display EER Status Table, echo=FALSE}
+DT::datatable(EER_stat_df)
 ```
 
-## Visualizing Ecological Status 
+## Visualizing Eco-evolutionary Status 
 
 We can map the ecological statuses of species from the large dataframe onto interactive 3D space. This object can be manipulated and positioned by the user in order to best visualize the respective ecological statuses. 
 
@@ -136,11 +162,21 @@ We can map the ecological statuses of species from the large dataframe onto inte
 </style>
 
 ```{r Create 3d Visualization, out.width="100%", fig.dim = c(6, 6)}
-figure <- plot_eco_status(data_frame = eco_stat_df, fun_dist = "fun_dist", range_size = "range_size", evol_dist = "mean_evol_dist")
+figure <- plot_EER_status(data_frame = EER_stat_df, fun_dist = "fun_dist", range_size = "range_size", evol_dist = "mean_evol_dist")
 rglwidget()
 ```
 
 
 ### If a still-image is desired rgl::rgl.snapshot() is recommended.
 
+## Extra
+### GeoFunPhy also offers plotting functionality of raw (unclipped) range polygons 
 
+```{r Plot Convex Hulls, results=FALSE, echo=TRUE, message=FALSE}
+trait_df_subset <- trait_df[1:5, ]
+acer_maps <- range_poly_map(data_frame = trait_df_subset)
+```
+
+```{r Map Output}
+knitr::include_graphics("acer_map_screenshot.png")
+```

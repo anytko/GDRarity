@@ -2,7 +2,7 @@
 #'
 #' This function uses a continent GeoJSON or shape file (.shp & .shx) file to clip range polygons to land boundaries.
 #'
-#' @param polygons_list A nested list of \code{sf} objects representing the convex hulls of a species range.
+#' @param convex_hulls A nested list of \code{sf} objects representing the convex hulls of a species range.
 #' @param continent_sf A file of continent boundaries. We recommend using Natural Earth's GeoJSON or shape files. 
 #' @return A nested list of clipped range polygons
 #' @import rmapshaper
@@ -17,17 +17,17 @@
 #' # Get continent data from a GeoJSON file
 #' continent_sf_example <- get_continent_sf("https://d2ad6b4ur7yvpq.cloudfront.net/naturalearth-3.3.0/ne_50m_admin_0_countries.geojson")
 #' # Clip the range polygons to continent bounds 
-#' clipped_polygons <- clip_polygons_to_land(polygons_list = unclipped_hulls, continent_sf = continent_sf_example)
+#' clipped_polygons <- clip_polygons_to_land(convex_hulls = unclipped_hulls, continent_sf = continent_sf_example)
 #' print(clipped_polygons)
 #' @export
 #' 
-clip_polygons_to_land <- function(polygons_list, continent_sf) {
+clip_polygons_to_land <- function(convex_hulls, continent_sf) {
   # Check if the input is NULL
-  if (is.null(polygons_list) || length(polygons_list) == 0) {
+  if (is.null(convex_hulls) || length(convex_hulls) == 0) {
     return(NULL)
   }
   
-  clipped_polygons_list <- lapply(polygons_list, function(convex_hulls) {
+  clipped_polygons_list <- lapply(convex_hulls, function(convex_hulls) {
     clipped_polygons <- lapply(convex_hulls, function(ch) {
       result <- tryCatch({
         # Set the CRS of the input polygon to match the CRS of the continent polygons
@@ -61,3 +61,7 @@ clip_polygons_to_land <- function(polygons_list, continent_sf) {
   
   return(clipped_polygons_list)
 }
+
+
+
+
