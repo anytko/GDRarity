@@ -18,13 +18,13 @@
 #' test_data <- data.frame(species_name = c("Abies_cephalonica", "Abies_firma"))
 #' 
 #' # Get continent bounds
-#' continent_bounds <- get_continent_sf(url = "https://d2ad6b4ur7yvpq.cloudfront.net/naturalearth-3.3.0/ne_50m_admin_0_countries.geojson")
+#' continent_bounds <- get_continent_sf()
 #' 
 #' # Find convex hulls for Abies cephalonica and Abies firma
-#' test_hulls <- get_range_convex_hulls(test)
+#' test_hulls <- GeoFunPhy::get_range_convex_hulls(test_data)
 #' 
 #' # Clip convex hulls to continent bounds
-#' clipped_polys <- clip_polygons_to_land(convex_hulls = test_hulls, continent_sf)
+#' clipped_polys <- clip_polygons_to_land(test_hulls, continent_bounds)
 #' 
 #' # Check intersections with continents - Abies cephalonica is found in Europe and Abies firma is found in Asia
 #' intersections <- check_continents(convex_hulls = clipped_polys, continent_sf = continent_bounds)

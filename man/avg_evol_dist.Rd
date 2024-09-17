@@ -35,7 +35,7 @@ Many species are evolutionarily distinct within genera but are evolutionarily in
 \examples{
 
 Import phylogeny
-GBMB_phy <- get_phy(phy_choice = "GBMB")
+GBMB_phy <- get_phy_angio(phy_choice = "GBMB")
 
 Create dataframe with species names
 maple_data <- data.frame(species_name = c("Acer_campestre", "Acer_monspessulanum", "Acer_negundo", "Acer_opalus", "Acer_platanoides", "Acer_pseudoplatanus", "Acer_saccharinum"))

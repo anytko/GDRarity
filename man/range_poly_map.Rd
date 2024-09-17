@@ -10,7 +10,9 @@ range_poly_map(
   min_points = 5,
   min_distance = 1,
   gbif_limit = 2000,
-  plot = TRUE
+  plot = TRUE,
+  clip = FALSE,
+  continent_sf = NULL
 )
 }
 \arguments{
@@ -35,8 +37,13 @@ This function combines the functionality of EcoStatusR::create_range_polygons() 
 }
 \examples{
 
-oak_data <- data.frame(species_name = c("Quercus alba", "Quercus rubra"))
+species_data <- data.frame(species_name = c("Abies alba", "Quercus nigra"))
 
-range_poly_map(data_frame = oak_data)
+# Plotting unclipped range polygons
+range_poly_map(data_frame = species_data)
+
+# Plotting clipped range polygons
+continent_bounds <- get_continent_sf()
+range_poly_map(data_frame = species_data, clip = TRUE, continent_sf = continent_bounds)
 
 }

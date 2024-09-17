@@ -96,15 +96,15 @@ check_EER_status_k <- function(data_frame, range_size_col, mean_evol_dist_col, f
       } else if (range_size_condition && !evol_dist_condition && trait_condition) {
         classification <- "Endemic"
       } else if (range_size_condition && !evol_dist_condition && !trait_condition) {
-        classification <- "Competitively Rare"
+        classification <- "Environmentally Rare"
       } else if (range_size_condition && evol_dist_condition && !trait_condition) {
         classification <- "Relict"
       } else if (!range_size_condition && evol_dist_condition && !trait_condition) {
         classification <- "Adaptable Survivor"
       } else if (!range_size_condition && evol_dist_condition && trait_condition) {
-        classification <- "Keystone"
+        classification <- "Indicator"
       } else if (!range_size_condition && !evol_dist_condition && trait_condition) {
-        classification <- "Potentially Invasive"
+        classification <- "High Invasive Potential"
       } else {
         classification <- "Common"
       }

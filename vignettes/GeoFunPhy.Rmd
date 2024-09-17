@@ -35,7 +35,7 @@ options(rgl.useNULL = TRUE)
 
 ## Create Trait Dataframe
 ```{r Create Trait Dataframe, results='asis'}
-trait_df <- build_trait_data(columns_to_select = c("SLA", "seed_mass", "leaf_mass", "canopy_height"), genera = c("Acer_", "Pinus_", "Fraxinus_", "Quercus_", "Tsuga_", "Solidago_", "Ulmus", "Populus", "Rhododendron_", "Betula_"))
+trait_df <- build_trait_data_LEDA(columns_to_select = c("SLA", "seed_mass", "leaf_mass", "canopy_height"), genera = c("Acer_", "Pinus_", "Fraxinus_", "Quercus_", "Tsuga_", "Solidago_", "Ulmus", "Populus", "Rhododendron_", "Betula_"))
 
 trait_df <- rownames_to_column(trait_df, var = "species_name")
 DT::datatable(trait_df)
@@ -51,12 +51,12 @@ Users can input their own phylogeny or use one of the four phylogeneies listed i
 * GBOTB: GenBank taxa with a backbone provided by Open Tree of Life version 9.1"
 
 ```{r Input Phylogeny}
-GBMB_phylogeny <- get_phy("GBMB")
+GBMB_phylogeny <- get_phy_angio("GBMB")
 ```
 
 ## Calculate Range Size *one step
 ```{r Calculate Range Sizes, results=FALSE, echo=TRUE, message=FALSE}
-species_range_size <- calc_range_size(data_frame = trait_df, min_points = 4, gbif_limit = 2250, num_cores = 1)
+species_range_size <- calc_range_size(data_frame = trait_df, min_points = 4, gbif_limit = 2000, num_cores = 1)
 ```
 
 ```{r Display Range Size Table, echo=FALSE}
@@ -73,12 +73,12 @@ convex_hulls <- get_range_convex_hulls(data_frame = trait_df, min_points = 4, gb
 
 ### Read in a continent GeoJSON 
 ```{r Get Continent SF, results=FALSE, echo=TRUE, message=FALSE}
-continent_bounds <- get_continent_sf(url = "https://d2ad6b4ur7yvpq.cloudfront.net/naturalearth-3.3.0/ne_50m_admin_0_countries.geojson")
+continent_bounds <- get_continent_sf()
 ```
 
 ### Clip range convex hulls to continent continent_bounds
 ```{r Clip Convex Hulls, results=FALSE, echo=TRUE, message=FALSE}
-clipped_hulls <- clip_polygons_to_land(polygons_list = convex_hulls, continent_sf = continent_bounds)
+clipped_hulls <- clip_polygons_to_land(convex_hulls = convex_hulls, continent_sf = continent_bounds)
 ```
 
 
@@ -90,6 +90,24 @@ range_sizes_step <- range_sizes(clipped_hulls)
 
 ```{r Display Range Size Table Step, echo=FALSE}
 DT::datatable(range_sizes_step)
+```
+
+## Find which continents contain each species' convex hulls
+```{r Find Continents, results=FALSE, echo=TRUE, message=FALSE}
+continents <- check_continents(clipped_hulls, continent_bounds)
+```
+
+```{r Display Continent Table , echo=FALSE}
+DT::datatable(continents)
+```
+
+## Find which biomes contain each species' convex hulls
+```{r Find Biomes, results=FALSE, echo=TRUE, message=FALSE}
+biomes <- check_biomes(clipped_hulls)
+```
+
+```{r Display Biomes Table , echo=FALSE}
+DT::datatable(biomes)
 ```
 
 
@@ -174,9 +192,9 @@ rglwidget()
 
 ```{r Plot Convex Hulls, results=FALSE, echo=TRUE, message=FALSE}
 trait_df_subset <- trait_df[1:5, ]
-acer_maps <- range_poly_map(data_frame = trait_df_subset)
+acer_maps <- range_poly_map(data_frame = trait_df_subset, clip = TRUE, continent_sf = continent_bounds)
 ```
 
-```{r Map Output}
+```{r Map Output, out.width='800px', out.height='600px'}
 knitr::include_graphics("acer_map_screenshot.png")
 ```

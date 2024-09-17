@@ -12,21 +12,37 @@
 #' 
 #' @examples 
 #' 
-#' oak_data <- data.frame(species_name = c("Quercus alba", "Quercus rubra"))
+#' species_data <- data.frame(species_name = c("Abies alba", "Quercus nigra"))
 #'
-#' range_poly_map(data_frame = oak_data)
+#' # Plotting unclipped range polygons
+#' range_poly_map(data_frame = species_data)
+#' 
+#' # Plotting clipped range polygons
+#' continent_bounds <- get_continent_sf()
+#' range_poly_map(data_frame = species_data, clip = TRUE, continent_sf = continent_bounds)
 #'
 #' @export
 #' 
-range_poly_map <- function(data_frame, species_name = NULL, min_points = 5, min_distance = 1, gbif_limit = 2000, plot = TRUE) {
+range_poly_map <- function(data_frame, species_name = NULL, min_points = 5, min_distance = 1, gbif_limit = 2000, plot = TRUE, clip = FALSE, continent_sf = NULL) {
+  
   # Call create_range_polygons function
   convex_hulls_list <- get_range_convex_hulls(data_frame = data_frame, species_name = species_name, min_points = min_points, min_distance = min_distance, gbif_limit = gbif_limit)
   
-  if (plot) {
-    # Call plot_convex_hulls function
-    plot_convex_hulls(convex_hulls_list)
+  # Clip polygons if clip is TRUE and continent_sf is provided
+  if (clip) {
+    if (is.null(continent_sf)) {
+      stop("continent_sf must be provided when clip = TRUE")
+    }
+    convex_hulls_list_clipped <- clip_polygons_to_land(convex_hulls_list, continent_sf)
+
+    # Plot the clipped polygons
+    if (plot) {
+      plot_clipped_hulls(convex_hulls_list_clipped)
+    }
+  } else {
+    # Plot the convex hulls
+    if (plot) {
+      plot_convex_hulls(convex_hulls_list)
+    }
   }
-  
 }
-
-

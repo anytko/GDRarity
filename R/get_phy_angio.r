@@ -1,4 +1,4 @@
-#' Get Phylogeny
+#' Get Phylogeny of Angiosperms
 #'
 #' Retreive seed plant phylogenies described in Smith & Brown 2018 from FePhyFoFum in github
 #'
@@ -19,26 +19,26 @@
 #' @author Alivia G Nytko, \email{anytko@@vols.utk.edu}
 #'
 #' @examples
-#' ALLMB_phy <- get_phy(phy_choice = "ALLMB")
+#' ALLMB_phy <- get_phy_angio(phy_choice = "ALLMB")
 #'
-#' ALLOTB_phy <- get_phy(phy_choice = "ALLOTB")
+#' ALLOTB_phy <- get_phy_angio(phy_choice = "ALLOTB")
 #'
-#' GMBM_phy <- get_phy(phy_choice = "GBMB")
+#' GMBM_phy <- get_phy_angio(phy_choice = "GBMB")
 #'
-#' GBOTB_phy <- get_phy(phy_choice = "GBOTB")
+#' GBOTB_phy <- get_phy_angio(phy_choice = "GBOTB")
 #'
 #' @importFrom Rdpack reprompt
 #'
 #' @references
-#' \insertRef{smithbrown2018}{EcoStatusR}
+#' \insertRef{smithbrown2018}{GeoFunPhy}
 #'
-#' \insertRef{kleyer2008}{EcoStatusR}
+#' \insertRef{kleyer2008}{GeoFunPhy}
 #'
-#' \insertRef{Magallon2015}{EcoStatusR}
+#' \insertRef{Magallon2015}{GeoFunPhy}
 #'
 #' @export
 #'
-get_phy <- function(phy_choice){
+get_phy_angio <- function(phy_choice){
   if (phy_choice == "ALLMB") {
     phy <- 'https://github.com/FePhyFoFum/big_seed_plant_trees/releases/download/v0.1/v0.1.zip'
 download.file(phy, file.path(tempdir(), 'v01.zip'))

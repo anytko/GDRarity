@@ -4,10 +4,10 @@
 \alias{get_continent_sf}
 \title{Get continent spatial data from a GeoJSON file}
 \usage{
-get_continent_sf(url)
+get_continent_sf(url = NULL)
 }
 \arguments{
-\item{url}{The URL of a GeoJSON file containing country or continent data}
+\item{url}{Optional URL of a GeoJSON file containing country or continent data. Default is NULL - if NULL the package uses embeded continent boundaries from Natural Earth.}
 }
 \value{
 An \code{sf} object containing polygons representing continents. The object includes a column for the continent names and corresponding geometries.
@@ -17,6 +17,6 @@ This function reads a GeoJSON file from a given URL, extracts continent informat
 }
 \examples{
 # Get continent data from a GeoJSON file
-continent_sf <- get_continent_sf(url = "https://d2ad6b4ur7yvpq.cloudfront.net/naturalearth-3.3.0/ne_50m_admin_0_countries.geojson")
+continent_sf <- get_continent_sf()
 print(continent_sf)
 }

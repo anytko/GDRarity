@@ -4,10 +4,10 @@
 \alias{clip_polygons_to_land}
 \title{Clip species range polygons to land boundaries}
 \usage{
-clip_polygons_to_land(polygons_list, continent_sf)
+clip_polygons_to_land(convex_hulls, continent_sf)
 }
 \arguments{
-\item{polygons_list}{A nested list of \code{sf} objects representing the convex hulls of a species range.}
+\item{convex_hulls}{A nested list of \code{sf} objects representing the convex hulls of a species range.}
 
 \item{continent_sf}{A file of continent boundaries. We recommend using Natural Earth's GeoJSON or shape files.}
 }
@@ -26,8 +26,8 @@ test_data <- data.frame(species_name = c("Abies_cephalonica"))
 Retrieve the unclipped range convex hulls 
 unclipped_hulls <- get_range_convex_hulls(test_data)
 # Get continent data from a GeoJSON file
-continent_sf_example <- get_continent_sf("https://d2ad6b4ur7yvpq.cloudfront.net/naturalearth-3.3.0/ne_50m_admin_0_countries.geojson")
+continent_sf_example <- get_continent_sf()
 # Clip the range polygons to continent bounds 
-clipped_polygons <- clip_polygons_to_land(polygons_list = unclipped_hulls, continent_sf = continent_sf_example)
+clipped_polygons <- clip_polygons_to_land(convex_hulls = unclipped_hulls, continent_sf = continent_sf_example)
 print(clipped_polygons)
 }

@@ -15,7 +15,7 @@
 #' Retrieve the unclipped range convex hulls 
 #' unclipped_hulls <- get_range_convex_hulls(test_data)
 #' # Get continent data from a GeoJSON file
-#' continent_sf_example <- get_continent_sf("https://d2ad6b4ur7yvpq.cloudfront.net/naturalearth-3.3.0/ne_50m_admin_0_countries.geojson")
+#' continent_sf_example <- get_continent_sf()
 #' # Clip the range polygons to continent bounds 
 #' clipped_polygons <- clip_polygons_to_land(convex_hulls = unclipped_hulls, continent_sf = continent_sf_example)
 #' print(clipped_polygons)
@@ -61,7 +61,4 @@ clip_polygons_to_land <- function(convex_hulls, continent_sf) {
   
   return(clipped_polygons_list)
 }
-
-
-
 

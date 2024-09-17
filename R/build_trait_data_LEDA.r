@@ -1,4 +1,4 @@
-#' Build Trait Data
+#' Build Trait Data from the LEDA Traitbase
 #' 
 #' Build a dataframe of trait data for various plant species of interest using LEDA trait database.
 #' 
@@ -30,17 +30,17 @@
 #' print(maple_traits)
 #' 
 #' Build dataframe using canopy height for major tree species
-#' tree_traits <- build_trait_data(columns_to_select = "canopy_height", genera = c("Acer_", "Quercus_", "Populus_", "Ulmus_", "Pinus_", "Alnus_", "Betula_", "Salix_", "Abies_", "Fraxinus_", "Tsuga_", "Prunus_"))
+#' tree_traits <- build_trait_data_LEDA(columns_to_select = "canopy_height", genera = c("Acer_", "Quercus_", "Populus_", "Ulmus_", "Pinus_", "Alnus_", "Betula_", "Salix_", "Abies_", "Fraxinus_", "Tsuga_", "Prunus_"))
 #' print(tree_traits)
 #' 
 #' @importFrom Rdpack reprompt
 #' 
 #' @references
-#' \insertRef{kleyer2008}{EcoStatusR}
+#' \insertRef{kleyer2008}{GeoFunPhy}
 #' 
 #' @export 
 #' 
-build_trait_data <- function(columns_to_select, genera = NULL) {
+build_trait_data_LEDA <- function(columns_to_select, genera = NULL) {
   SLA <- read.delim("https://uol.de/f/5/inst/biologie/ag/landeco/download/LEDA/Data_files/SLA_und_geo_neu2.txt", skip=4, sep=';', colClasses = c(general.method="NULL", sample.size="NULL", valid="NULL", leaf.specific.method="NULL", reference="NULL", SBS.number="NULL", original.reference="NULL", country="NULL", UTM.zone="NULL", UTM.easting="NULL", UTM.northing="NULL", mean.SLA..mm.2.mg.="NULL", maximum.SLA..mm.2.mg.="NULL", minimum.SLA..mm.2.mg.="NULL", number.of.replicates="NULL", standard.deviation="NULL", standard.error="NULL", balance.error..mg.="NULL", collection.date="NULL", general.comment="NULL", plant.stage="NULL", X="NULL"), col.names = c("species", "general.method", "SLA", "sample.size", "valid", "leaf.specific.method", "reference", "SBS.number", "original.reference", "country", "UTM.zone", "UTM.easting", "UTM.northing", "mean.SLA..mm.2.mg.", "maximum.SLA..mm.2.mg.", "minimum.SLA..mm.2.mg.", "number.of.replicates", "standard.deviation", "standard.error", "balance.error..mg.", "collection.date", "general.comment", "plant.stage", "X"))
 
   seed_mass <- read.delim("https://uol.de/f/5/inst/biologie/ag/landeco/download/LEDA/Data_files/seed_mass.txt", skip=3, sep=';', colClasses = c(SBS.number="NULL", general.method="NULL", diaspore.type="NULL", sample.size="NULL", valid="NULL", median="NULL", reference="NULL", mean.SM..mg.="NULL", maximum.SM..mg.="NULL", minimum.SM..mg.="NULL", number.of.replicates="NULL", general.comment="NULL", Drying.method="NULL", original.reference="NULL", diaspore.type.code="NULL"), col.names= c("species", "SBS.number", "general.method", "diaspore.type", "seed_mass", "sample.size", "valid", "median", "reference", "mean.SM..mg.", "maximum.SM..mg.", "minimum.SM..mg.", "number.of.replicates", "general.comment", "Drying.method", "original.reference", "diaspore.type.code"))

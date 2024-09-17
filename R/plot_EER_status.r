@@ -54,11 +54,11 @@ plot_EER_status <- function(data_frame, fun_dist, evol_dist, range_size) {
   classification_colors <- c(
     "Classically Rare" = "red",
     "Endemic" = "green",
-    "Competitively Rare" = "blue",
+    "Environmentally Rare" = "blue",
     "Relict" = "#9946cc",
     "Adaptable Survivor" = "#c17f06",
-    "Potentially Invasive" = "#10cfc8",
-    "Keystone" = "#a4127f",
+    "High Invasive Potential" = "#10cfc8",
+    "Indicator" = "#a4127f",
     "Common" = "#030000"
   )
   point_colors <- classification_colors[data_frame$classifications]
@@ -72,7 +72,7 @@ plot_EER_status <- function(data_frame, fun_dist, evol_dist, range_size) {
     col = point_colors,  
     size = 1,  
     type = "s",  
-    xlab = "Functional Uniqueness", 
+    xlab = "Functional Distinctiveness", 
     ylab = "Range Size",
     zlab = "Evolutionary Distinctiveness"  
   )

@@ -12,9 +12,10 @@ species varying in geographic, phylogenetic, and functional trait
 rarity. The ecological status proposed in GeoFunPhy can be used to infer
 larger organismal strategy.
 
--   get\_phy() sources a choice of phylogeny from Smith & Brown 2018
--   build\_trait\_data() constructs a dataframe of chosen functional
-    traits from the LEDA trait database
+-   get\_phy\_angio() sources a choice of phylogeny from Smith & Brown
+    2018
+-   build\_trait\_data\_LEDA() constructs a dataframe of chosen
+    functional traits from the LEDA trait database
 -   calc\_range\_size() calculates the range size of species
 -   avg\_evol\_dist() calculates the evolutionary distinctiveness of
     species across distinct times and multiple phylogenetic extents
@@ -38,8 +39,12 @@ larger organismal strategy.
 -   range\_sizes() calculates the range size of clipped convex hulls
 -   get\_continent\_sf() reads and formats a GeoJSON document with
     continent data
+-   check\_continents() checks which continents species convex hulls
+    occur in
+-   check\_biomes() checks which biomes species convex hulls occur in
 -   plot\_convex\_hulls() plots species’ occurence polygons onto a world
-    map
+    map -plot\_clipped\_hulls() plots species’ clipped occurence
+    polygons (clipped to continent bounds) onto a world map
 -   range\_poly\_map() creates and plots species’ occurence polygons
     onto a world map
 -   plot\_EER\_status() visualizes eco-evolutionary rarity categories in
@@ -54,14 +59,17 @@ You can install the development version of GeoFunPhy like so:
 ## Example
 
 This is a basic example which demonstrates GeoFunPhy useage and shows
-how you can determine the ecological status of common tree genera using
-SLA, seed\_mass, and canopy\_height:
+how you can determine the eco-evolutionary status of common tree genera
+using SLA, seed\_mass, and canopy\_height. Note that certain functions,
+such as check\_continents(), check\_biomes(), and those called by
+calc\_range\_size() are not included. Please see the GeoFunPhy vignette
+for more information on extra functionality.
 
     library(GeoFunPhy)
 
 ## Create Trait Dataframe
 
-    trait_df <- build_trait_data(columns_to_select = c("SLA", "seed_mass", "canopy_height"), genera = c("Acer_", "Pinus_", "Fraxinus_", "Quercus_", "Tsuga_", "Ulmus", "Populus", "Betula_"))
+    trait_df <- build_trait_data_LEDA(columns_to_select = c("SLA", "seed_mass", "canopy_height"), genera = c("Acer_", "Pinus_", "Fraxinus_", "Quercus_", "Tsuga_", "Ulmus", "Populus", "Betula_"))
 
     trait_df <- rownames_to_column(trait_df, var = "species_name")
 
@@ -80,11 +88,11 @@ listed in Smith & Brown 2018 including:
 
 <!-- -->
 
-    GBMB_phylogeny <- get_phy("GBMB")
+    GBMB_phylogeny <- get_phy_angio("GBMB")
 
 ## Calculate Range Sizes
 
-    range_sizes_df <- calc_range_size(data_frame = trait_df, num_cores = 7, gbif_limit = 2500)
+    range_sizes_df <- calc_range_size(data_frame = trait_df, num_cores = 1, gbif_limit = 2500)
 
 ## Plot Range Polygons
 
@@ -93,6 +101,12 @@ listed in Smith & Brown 2018 including:
     acer_campestre_range <- data.frame(species_name = c("Acer campestre"))
 
     range_poly_map(data_frame = acer_campestre_range)
+    #> Warning in RColorBrewer::brewer.pal(min(n_species, 12), "Set1"): minimal value for n is 3, returning requested palette with 3 different levels
+
+    # OR
+
+    continent_bounds <- get_continent_sf()
+    range_poly_map(data_frame = acer_campestre_range, clip = TRUE, continent_sf = continent_bounds)
     #> Warning in RColorBrewer::brewer.pal(min(n_species, 12), "Set1"): minimal value for n is 3, returning requested palette with 3 different levels
 
 ## Calculate Average Evolutionary Distinctiveness
@@ -118,15 +132,15 @@ species with NA values for any trait.
 
 ### The optimal K means value can be determined by finding the “elbow” or bend in the plot. For example, in the three plots below a K = 3 represents the plot’s elbow.
 
-    range_elbow_plot <- elbow_plot(data = scaled_df, variable = "range_size")
+    elbow_plot(data = scaled_df, variable = "range_size")
 
 <img src="man/figures/README-Elbow Plot Range Size-1.png" width="100%" />
 
-    evol_dist_elbow_plot <- elbow_plot(data = scaled_df, variable = "mean_evol_dist")
+    elbow_plot(data = scaled_df, variable = "mean_evol_dist")
 
 <img src="man/figures/README-Elbow Plot Evolutionary Distinctiveness-1.png" width="100%" />
 
-    fun_dist_elbow_plot <- elbow_plot(data = scaled_df, variable = "fun_dist")
+    elbow_plot(data = scaled_df, variable = "fun_dist")
 
 <img src="man/figures/README-Elbow Plot Functional Distinctiveness-1.png" width="100%" />
 
