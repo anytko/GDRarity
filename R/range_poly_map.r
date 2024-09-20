@@ -46,3 +46,4 @@ range_poly_map <- function(data_frame, species_name = NULL, min_points = 5, min_
     }
   }
 }
+

@@ -23,6 +23,21 @@
 #' @export
 #'
 get_range_convex_hulls <- function(data_frame, species_name = NULL, num_cores = 1, min_points = 5, min_distance = 1, gbif_limit = 2000) {
+  # Validate num_cores
+  if (!is.numeric(num_cores) || num_cores <= 0 || floor(num_cores) != num_cores) {
+    stop("num_cores must be a positive integer")
+  }
+
+  # Validate min_points
+  if (!is.numeric(min_points) || min_points <= 0 || floor(min_points) != min_points) {
+    stop("min_points must be a positive whole number")
+  }
+
+  # Validate min_distance
+  if (!is.numeric(min_distance) || min_distance <= 0) {
+    stop("min_distance must be a positive number")
+  }
+
   rownames(data_frame) <- gsub("_", " ", rownames(data_frame))
 
   if (is.null(species_name)) {

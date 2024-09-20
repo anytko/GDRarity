@@ -33,6 +33,21 @@
 #' @export
 #' 
 define_custom_k_ranges <- function(data, variable, k) {
+  # Check if the variable is present in the data frame
+  if (!(variable %in% colnames(data))) {
+    stop("The specified variable must be found within the data frame.")
+  }
+  
+  # Check if k is a positive number
+  if (k <= 0) {
+    stop("Number of clusters (k) must be a positive integer.")
+  }
+  
+  # Check if k is greater than the number of rows in the data
+  if (k > nrow(data)) {
+    stop("Number of clusters (k) cannot be greater than the number of observations in the data.")
+  }
+  
   # Perform k-means clustering
   clusters <- kmeans(data[[variable]], centers = k)
 
@@ -66,3 +81,4 @@ define_custom_k_ranges <- function(data, variable, k) {
   # Return the data with custom cluster ranges
   return(list(data = data, custom_ranges = custom_ranges))
 }
+

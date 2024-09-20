@@ -22,7 +22,7 @@
 #' 
 #' mean_evol_dist_values <- runif(min = -2, max = 2, n=23)
 #'
-#'forest_data <- data.frame(species_name = species_names, fun_dist = FD_values, range_size = range_values, mean_evol_dist = mean_evol_dist_values)
+#' forest_data <- data.frame(species_name = species_names, fun_dist = FD_values, range_size = range_values, mean_evol_dist = mean_evol_dist_values)
 #'
 #' Calculate the 8 wcss values for range size 
 #' wcss_range <- compute_wcss(data = forest_data, variable = "range_size", k_values= c(1, 2, 3, 4, 5, 6, 7, 8))
@@ -43,11 +43,38 @@
 #' 
 #' @export
 #' 
-compute_wcss <- function(data, variable, k_values) {
+compute_wcss <- function(data, variable, k_values, seed = 42) {
+  # Check if the variable exists in the data frame
+  if (!variable %in% names(data)) {
+    stop(paste("Variable", variable, "does not exist in the data frame."))
+  }
+  
+  # Check if the variable is numeric
+  if (!is.numeric(data[[variable]])) {
+    stop(paste("Variable", variable, "is not numeric."))
+  }
+  
+  # Check if k_values is numeric and valid
+  if (!is.numeric(k_values) || any(k_values <= 0)) {
+    stop("k_values must be a numeric vector with positive values.")
+  }
+  
+  # Ensure k_values is within the valid range
+  num_points <- nrow(data)
+  if (any(k_values >= num_points) || any(k_values <= 0)) {
+    stop("k values must be strictly less than the number of data points and positive.")
+  }
+  
+  # Calculate WCSS values
   wcss_values <- sapply(k_values, function(k) {
-    model <- kmeans(data[[variable]], centers = k)
-    return(sum(model$withinss))
+    if (k < num_points && k > 0) {
+      set.seed(seed) 
+      model <- kmeans(data[[variable]], centers = k)
+      return(sum(model$withinss))
+    } else {
+      return(NA)  # Return NA for invalid k values
+    }
   })
+  
   return(wcss_values)
 }
-

@@ -4,7 +4,7 @@
 \alias{elbow_plot}
 \title{Display Elbow Plot}
 \usage{
-elbow_plot(data, variable, k_max = 10)
+elbow_plot(data, variable, k_max = 10, ggplot = FALSE)
 }
 \arguments{
 \item{data}{A data frame containing the data for which the elbow plot is to be displayed.}
@@ -12,6 +12,8 @@ elbow_plot(data, variable, k_max = 10)
 \item{variable}{The variable in the data frame for which the elbow plot is to be generated. Use the name of the column in "".}
 
 \item{k_max}{The maximum number of clusters (k) to consider. Default is 10.}
+
+\item{ggplot}{Logical indicator. Default is FALSE. If FALSE the function returns a R base plot. If TRUE the function returns a ggplot.}
 }
 \description{
 Plot the Within-Cluster Sum of Squares (WCSS) against the number of clusters (k) to determine the optimal value of k using the Elbow Method.
@@ -36,12 +38,12 @@ Plot the elbow plot for range size
 elbow_plot(forest_data, "range_size")
 
 Plot the elbow plot for average evolutionary distinctivess
-elbow_plot(forest_data, "mean_evol_dist")
+elbow_plot(forest_data, "mean_evol_dist", 8)
 
 Plot the elbow plot for functional distinctiveness
-elbow_plot(forest_data, "fun_dist")
+fun_dist_elbow <- elbow_plot(forest_data, "fun_dist", 10, ggplot = TRUE)
 
 }
 \seealso{
-Use this function to visualize the optimal k value before computing eco-evolutionary statusing using EcoStatusR::check_eco_status().
+Use this function to visualize the optimal k value before computing eco-evolutionary statusing using GeoFunPhy::check_EER_status_k().
 }

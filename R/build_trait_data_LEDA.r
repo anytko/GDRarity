@@ -65,9 +65,16 @@ build_trait_data_LEDA <- function(columns_to_select, genera = NULL) {
     result <- mean_data
   }
 
-  result <- result %>% remove_rownames %>% column_to_rownames(var = "species")
+   result <- result %>% rename(species_name = species)
 
-  result <- subset(result, select = columns_to_select)
+  # Validate the columns before subsetting
+  missing_columns <- setdiff(columns_to_select, colnames(result))
+  if (length(missing_columns) > 0) {
+    stop("Invalid columns selected: ", paste(missing_columns, collapse = ", "))
+  }
+
+  # Subset based on the selected columns
+  result <- result %>% select(all_of(c("species_name", columns_to_select)))
 
   View(result)
   return(result)

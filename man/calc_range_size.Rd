@@ -34,9 +34,9 @@ This function calculates the range sizes (sq km) of multiple species by retrievi
 }
 \examples{
 # Generate a test dataframe with species Abies cephalonica
-test_data <- data.frame(species_name = c("Abies_cephalonica"))
+test_data <- data.frame(species_name = c("Betula_humilis"))
 
 # Generate range sizes for each speices
-range_size <- calc_range_size(data_frame = test_data)
+range_size <- calc_range_size(data_frame = test_data, min_points = 4)
 print(range_size)
 }

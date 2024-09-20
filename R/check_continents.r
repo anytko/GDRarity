@@ -33,8 +33,35 @@
 #' @export
 #' 
 check_continents <- function(convex_hulls, continent_sf) {
+  # Check if continent_sf is missing
+  if (missing(continent_sf)) {
+    stop("Error: The continent_sf input is missing. Please provide a valid sf object with geometries.")
+  }
+  
+  # Check if continent_sf is an sf object
+  if (!inherits(continent_sf, "sf")) {
+    stop("Error: The continent_sf input is not an sf object. Please provide a valid sf object with geometries.")
+  }
+  
   # Ensure continent polygons are valid
-  continent_sf <- st_make_valid(continent_sf)
+  continent_sf <- tryCatch(
+    {
+      # Check if continent_sf has valid geometries
+      if (any(!st_is_valid(continent_sf))) {
+        st_make_valid(continent_sf)
+      } else {
+        continent_sf
+      }
+    },
+    error = function(e) {
+      stop("Error: The continent_sf input contains invalid geometries. Please provide valid geometries.")
+    }
+  )
+  
+  # Check if convex_hulls is empty and return an error if it is
+  if (length(convex_hulls) == 0) {
+    stop("Error: The convex_hulls list is empty. Please provide valid convex hulls.")
+  }
   
   # Initialize an empty list to store results
   results_list <- list()
@@ -76,3 +103,7 @@ check_continents <- function(convex_hulls, continent_sf) {
   
   return(results_df)
 }
+
+
+
+

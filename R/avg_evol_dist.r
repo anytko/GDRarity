@@ -36,6 +36,16 @@
 #' 
 #' @export 
 avg_evol_dist <- function(phy, data_frame, taxon = NULL, time_slices = c(25, 50, 75, 100, 115), num_cores = 1) {
+  # Early exit if the data_frame is empty
+  if (nrow(data_frame) == 0) {
+    stop("The provided data frame is empty. Cannot compute evolutionary distinctiveness.")
+  }
+
+  # Check if phy is a valid 'phylo' object
+  if (!inherits(phy, "phylo")) {
+    stop("The provided phy object is not of class 'phylo'.")
+  }
+
   # Set the number of cores to use
   if (num_cores < 1) {
     stop("num_cores must be at least 1")
@@ -48,10 +58,15 @@ avg_evol_dist <- function(phy, data_frame, taxon = NULL, time_slices = c(25, 50,
   }
 
   # Prune the phylogeny based on species names in the dataframe
-  phy <- drop.tip(phy, setdiff(phy$tip.label, taxon))
+  pruned_phy <- drop.tip(phy, setdiff(phy$tip.label, taxon))
+
+  # Check if pruning removed all tips or the object is no longer a valid phylo object
+  if (is.null(pruned_phy) || !inherits(pruned_phy, "phylo")) {
+    stop("Pruning resulted in an invalid tree. Cannot compute evolutionary distinctiveness.")
+  }
 
   # Get the age of the root of the phylogeny
-  root_age <- max(ape::branching.times(phy))
+  root_age <- max(ape::branching.times(pruned_phy))
 
   # Check if the chosen time slices are greater than the root age
   if (any(time_slices > root_age)) {
@@ -69,7 +84,7 @@ avg_evol_dist <- function(phy, data_frame, taxon = NULL, time_slices = c(25, 50,
       age <- root_age - time_slices[j]
 
       # Slice the phylogeny
-      phy_sliced <- phytools::treeSlice(phy, age, trivial = TRUE)
+      phy_sliced <- phytools::treeSlice(pruned_phy, age, trivial = TRUE)
 
       # Find the focal tree
       focal_tree <- NULL
@@ -116,6 +131,4 @@ avg_evol_dist <- function(phy, data_frame, taxon = NULL, time_slices = c(25, 50,
 
   return(result_df)
 }
-
-
 

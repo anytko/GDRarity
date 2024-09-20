@@ -5,7 +5,7 @@
 \title{Compute Within-Cluster Sum of Squares (WCSS)
 Compute the Within-Cluster Sum of Squares (WCSS) for a given variable and a range of cluster values (k) using k-means clustering.}
 \usage{
-compute_wcss(data, variable, k_values)
+compute_wcss(data, variable, k_values, seed = 42)
 }
 \arguments{
 \item{data}{A data frame containing the data for clustering.}

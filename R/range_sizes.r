@@ -7,13 +7,13 @@
 #' 
 #' @examples
 #' # Create a dataframe with a 'species_name' column
-#' test_data <- data.frame(species_name = c("Abies_cephalonica"))
+#' test_data <- data.frame(species_name = c("Acer_campestre", "Acer_platanoides"))
 #' # Generate range polygons for the speceis in the dataframe
-#' polygon_list <- get_range_polygons(test_data)
+#' polygon_list <- get_range_convex_hulls(test_data)
 #' # Get continent boundaries
-#' continent_sf <- get_continent_sf("https://d2ad6b4ur7yvpq.cloudfront.net/naturalearth-3.3.0/ne_50m_admin_0_countries.geojson")
+#' continent_sf <- get_continent_sf()
 #' # Clip these range polygons to the continent bounds
-#'clipped_polygon_list <- clip_polygons_to_land(polygon_list, continent_sf)
+#' clipped_polygon_list <- clip_polygons_to_land(polygon_list, continent_sf)
 #' # Generate range sizes for each speices using the clipped range polygons
 #' sizes <- range_sizes(clipped_polygons_list = clipped_polygon_list)
 #' @export
@@ -63,3 +63,4 @@ range_sizes <- function(clipped_polygons_list) {
   
   return(result_df)
 }
+

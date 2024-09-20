@@ -42,45 +42,55 @@
 
 check_EER_status_k <- function(data_frame, range_size_col, mean_evol_dist_col, fun_dist_col, range_size_k, mean_evol_dist_k, fun_dist_k ) {
   
+  # Initialize the classification column with NA
+  data_frame$classifications <- NA
+
+  # Identify species with any NA values and assign "NA" classification
+  species_with_na <- unique(data_frame$species_name[ 
+    is.na(data_frame[[range_size_col]]) |
+    is.na(data_frame[[mean_evol_dist_col]]) |
+    is.na(data_frame[[fun_dist_col]])
+  ])
+  
+  if (length(species_with_na) > 0) {
+    data_frame$classifications[data_frame$species_name %in% species_with_na] <- "NA"
+  }
+
+  # Check if all species are classified as "NA"
+if (all(is.na(data_frame[[range_size_col]])) | 
+    all(is.na(data_frame[[mean_evol_dist_col]])) | 
+    all(is.na(data_frame[[fun_dist_col]]))) {
+  stop("All values in one or more columns are NA. Cannot perform classification.")
+}
+
+  # Filter out species with NA classifications for k-clustering
+  data_to_cluster <- data_frame[is.na(data_frame$classifications), ]
   
   # Choose optimal K for range size
   k_range_size <- range_size_k
-  
-  # Define custom ranges for range size
-  range_size_ranges <- define_custom_k_ranges(data.frame(range_size = data_frame[[range_size_col]]), range_size_col, k_range_size)$custom_ranges
+  range_size_ranges <- define_custom_k_ranges(data.frame(range_size = data_to_cluster[[range_size_col]]), range_size_col, k_range_size)$custom_ranges
   range_size_threshold <- range_size_ranges[[1]][2]
 
-  
   # Choose optimal K for mean evolutionary distance
   k_mean_evol_dist <- mean_evol_dist_k
-  
-  # Define custom ranges for mean evolutionary distance
-  mean_evol_dist_ranges <- define_custom_k_ranges(data.frame(mean_evol_dist = data_frame[[mean_evol_dist_col]]), mean_evol_dist_col, k_mean_evol_dist)$custom_ranges
+  mean_evol_dist_ranges <- define_custom_k_ranges(data.frame(mean_evol_dist = data_to_cluster[[mean_evol_dist_col]]), mean_evol_dist_col, k_mean_evol_dist)$custom_ranges
   evol_dist_threshold <- mean_evol_dist_ranges[[length(mean_evol_dist_ranges)]][1]
 
   # Choose optimal K for functional distance
   k_fun_dist <- fun_dist_k
-  
-  # Define custom ranges for functional distance
-  fun_dist_ranges <- define_custom_k_ranges(data.frame(fun_dist = data_frame[[fun_dist_col]]), fun_dist_col, k_fun_dist)$custom_ranges
+  fun_dist_ranges <- define_custom_k_ranges(data.frame(fun_dist = data_to_cluster[[fun_dist_col]]), fun_dist_col, k_fun_dist)$custom_ranges
   fun_dist_threshold <- fun_dist_ranges[[length(fun_dist_ranges)]][1]
-  
-  # Categorize species into statuses based on the adjusted thresholds and custom ranges
-  for (species_name in unique(data_frame$species_name)) {
-    species_data <- data_frame[data_frame$species_name == species_name, ]
+
+  # Categorize remaining species into statuses based on the adjusted thresholds and custom ranges
+  for (species_name in unique(data_to_cluster$species_name)) {
+    species_data <- data_to_cluster[data_to_cluster$species_name == species_name, ]
     
     if (nrow(species_data) == 0) {
       cat("Species", species_name, "not found in the data frame\n")
       next
     }
     
-    if (any(is.na(species_data[[fun_dist_col]]))) {
-      cat("No", fun_dist_col, "trait information for", species_name, "\n")
-      data_frame$classifications[data_frame$species_name == species_name] <- "NA"
-      next
-    }
-
-    trait_value <- species_data[[fun_dist_col]]
+      trait_value <- species_data[[fun_dist_col]]
     range_size_value <- species_data[[range_size_col]]
     evol_dist_value <- species_data[[mean_evol_dist_col]]
 
@@ -115,3 +125,5 @@ check_EER_status_k <- function(data_frame, range_size_col, mean_evol_dist_col, f
 
   return(data_frame)
 }
+
+

@@ -71,8 +71,6 @@ for more information on extra functionality.
 
     trait_df <- build_trait_data_LEDA(columns_to_select = c("SLA", "seed_mass", "canopy_height"), genera = c("Acer_", "Pinus_", "Fraxinus_", "Quercus_", "Tsuga_", "Ulmus", "Populus", "Betula_"))
 
-    trait_df <- rownames_to_column(trait_df, var = "species_name")
-
 ## Input Phylogeny
 
 Users can input their own phylogeny or use one of the four phylogeneies
@@ -101,13 +99,11 @@ listed in Smith & Brown 2018 including:
     acer_campestre_range <- data.frame(species_name = c("Acer campestre"))
 
     range_poly_map(data_frame = acer_campestre_range)
-    #> Warning in RColorBrewer::brewer.pal(min(n_species, 12), "Set1"): minimal value for n is 3, returning requested palette with 3 different levels
 
-    # OR
+### OR
 
     continent_bounds <- get_continent_sf()
     range_poly_map(data_frame = acer_campestre_range, clip = TRUE, continent_sf = continent_bounds)
-    #> Warning in RColorBrewer::brewer.pal(min(n_species, 12), "Set1"): minimal value for n is 3, returning requested palette with 3 different levels
 
 ## Calculate Average Evolutionary Distinctiveness
 
@@ -132,17 +128,17 @@ species with NA values for any trait.
 
 ### The optimal K means value can be determined by finding the “elbow” or bend in the plot. For example, in the three plots below a K = 3 represents the plot’s elbow.
 
-    elbow_plot(data = scaled_df, variable = "range_size")
+    range_elbow <- elbow_plot(data = scaled_df, variable = "range_size", k_max = 10, ggplot = TRUE)
 
-<img src="man/figures/README-Elbow Plot Range Size-1.png" width="100%" />
+    print(range_elbow)
 
-    elbow_plot(data = scaled_df, variable = "mean_evol_dist")
+    evol_elbow <- elbow_plot(data = scaled_df, variable = "mean_evol_dist", k_max = 10, ggplot = TRUE)
 
-<img src="man/figures/README-Elbow Plot Evolutionary Distinctiveness-1.png" width="100%" />
+    print(evol_elbow)
 
-    elbow_plot(data = scaled_df, variable = "fun_dist")
+    fun_elbow <- elbow_plot(data = scaled_df, variable = "fun_dist", k_max = 10, ggplot = TRUE)
 
-<img src="man/figures/README-Elbow Plot Functional Distinctiveness-1.png" width="100%" />
+    print(fun_elbow)
 
 ## Determine Eco-Evolutionary Rarity Status
 

@@ -32,20 +32,26 @@ scale_by_median <- function(data_frame, columns_chosen = NULL) {
   if (is.null(columns_chosen)) {
     columns_chosen <- setdiff(names(data_frame), "species_name")
   }
-
+  
+  # Check for NA values in the dataframe
+  if (any(is.na(data_frame))) {
+    stop("Dataframe contains NA values. Please remove or impute NA values before applying the function.")
+  }
+  
   z_score_df <- data_frame  
-
+  
   for (trait_chosen in columns_chosen) {
     df_filtered <- data_frame[!is.na(data_frame[[trait_chosen]]), ]
-
+    
     median_trait <- median(df_filtered[[trait_chosen]], na.rm = TRUE)
     mad_trait <- median(abs(df_filtered[[trait_chosen]] - median_trait))
-
+    
     z_scores <- (df_filtered[[trait_chosen]] - median_trait) / mad_trait
-
+    
     matching_rows <- match(rownames(z_score_df), rownames(df_filtered))
     z_score_df[[trait_chosen]] <- z_scores[matching_rows]
   }
-
+  
   return(z_score_df)
 }
+

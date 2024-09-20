@@ -17,15 +17,25 @@
 #' @export
 #' 
 plot_clipped_hulls <- function(clipped_convex_hulls) {
+  # Check if the input is empty
+  if (length(clipped_convex_hulls) == 0) {
+    # Create an empty leaflet map
+    m <- leaflet() %>%
+      addTiles() %>%
+      setView(lng = 0, lat = 0, zoom = 2)  # Set initial view to world
+    print(m)
+    return(m)  # Return the empty map
+  }
+  
   # Extract species names from the names of the list
   species_names <- names(clipped_convex_hulls)
   
-  # Define a color palette with more flexibility
+  # Define a color palette
   n_species <- length(species_names)
-  colors <- RColorBrewer::brewer.pal(min(n_species, 12), "Set1")  # Use up to 12 colors from the Set1 palette
+  colors <- RColorBrewer::brewer.pal(min(n_species, 12), "Set1")
   
   if (n_species > 12) {
-    # If more than 12 species, generate additional colors
+    # Generate additional colors if more than 12 species
     additional_colors <- colorRampPalette(brewer.pal(12, "Set1"))(n_species - 12)
     colors <- c(colors, additional_colors)
   }
@@ -35,9 +45,9 @@ plot_clipped_hulls <- function(clipped_convex_hulls) {
     addTiles() %>%
     setView(lng = 0, lat = 0, zoom = 2)  # Set initial view to world
   
-  # Initialize a vector to hold legend labels and colors
-  legend_labels <- species_names
-  legend_colors <- colors[1:n_species]
+  # Initialize lists to hold valid species and polygons
+  valid_species <- list()
+  valid_colors <- list()
   
   # Add clipped polygons for each species
   for (j in seq_along(clipped_convex_hulls)) {
@@ -52,40 +62,46 @@ plot_clipped_hulls <- function(clipped_convex_hulls) {
     for (i in seq_along(species_polygons)) {
       polygon_sfc <- species_polygons[[i]]
       
-      # Convert sfc to sf object
       if (!is.null(polygon_sfc)) {
         polygon_sf <- st_as_sf(st_sfc(polygon_sfc, crs = 4326))
         sf_polygons[[i]] <- polygon_sf
       }
     }
     
-    # Combine all sf polygons into a single sf object
+    # If there are valid polygons, add them to the map and the valid lists
     if (length(sf_polygons) > 0) {
       combined_sf <- do.call(rbind, sf_polygons)
       
-      # Add polygons to the map
       m <- m %>% addPolygons(
         data = combined_sf,
         color = color,
         fillOpacity = 0.5,
         weight = 1,
-        group = species_name  # Add group for easy legend management
+        group = species_name
       )
+      
+      valid_species <- c(valid_species, species_name)
+      valid_colors <- c(valid_colors, color)
     }
   }
   
-  # Add legend to the map
-  m <- m %>%
-    addLegend(
-      position = "bottomright",
-      colors = legend_colors,
-      labels = legend_labels,
-      title = "Species"
-    )
+  # Add legend if there are valid species
+  if (length(valid_species) > 0) {
+    m <- m %>%
+      addLegend(
+        position = "bottomright",
+        colors = unlist(valid_colors),
+        labels = unlist(valid_species),
+        title = "Species"
+      )
+  }
   
   # Print the map
   print(m)
+  return(m)
 }
+
+
 
 
 

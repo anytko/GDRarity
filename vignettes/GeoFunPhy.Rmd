@@ -37,7 +37,6 @@ options(rgl.useNULL = TRUE)
 ```{r Create Trait Dataframe, results='asis'}
 trait_df <- build_trait_data_LEDA(columns_to_select = c("SLA", "seed_mass", "leaf_mass", "canopy_height"), genera = c("Acer_", "Pinus_", "Fraxinus_", "Quercus_", "Tsuga_", "Solidago_", "Ulmus", "Populus", "Rhododendron_", "Betula_"))
 
-trait_df <- rownames_to_column(trait_df, var = "species_name")
 DT::datatable(trait_df)
 ```
 
@@ -55,7 +54,7 @@ GBMB_phylogeny <- get_phy_angio("GBMB")
 ```
 
 ## Calculate Range Size *one step
-```{r Calculate Range Sizes, results=FALSE, echo=TRUE, message=FALSE}
+```{r Calculate Range Sizes, results=FALSE, echo=TRUE, warning=FALSE, message=FALSE}
 species_range_size <- calc_range_size(data_frame = trait_df, min_points = 4, gbif_limit = 2000, num_cores = 1)
 ```
 
@@ -67,7 +66,7 @@ DT::datatable(species_range_size)
 
 ### Generate range convex hulls
 ```{r Generate Range Convex Hulls, results=FALSE, echo=TRUE, message=FALSE}
-convex_hulls <- get_range_convex_hulls(data_frame = trait_df, min_points = 4, gbif_limit = 2250, num_cores = 1)
+convex_hulls <- get_range_convex_hulls(data_frame = trait_df, min_points = 4, gbif_limit = 2000, num_cores = 1)
 ```
 
 
@@ -77,7 +76,7 @@ continent_bounds <- get_continent_sf()
 ```
 
 ### Clip range convex hulls to continent continent_bounds
-```{r Clip Convex Hulls, results=FALSE, echo=TRUE, message=FALSE}
+```{r Clip Convex Hulls, results=FALSE, echo=TRUE, message=FALSE, warning=FALSE}
 clipped_hulls <- clip_polygons_to_land(convex_hulls = convex_hulls, continent_sf = continent_bounds)
 ```
 
@@ -143,18 +142,24 @@ DT::datatable(z_score_df)
 ### The optimal K means value can be determined by finding the "elbow" or bend in the plot. 
 
 ### Range Size Eblow: K = 2
-``` {r Elbow Plot Range Size}
-elbow_plot(data = z_score_df, variable = "range_size", k_max = 5)
+``` {r Elbow Plot Range Size, fig.width = 8, fig.height = 6}
+range_elbow <- elbow_plot(data = z_score_df, variable = "range_size", k_max = 5, ggplot = TRUE)
+
+print(range_elbow)
 ```
 
 ### Evolutionary Distinctiveness Eblow: K = 2
-``` {r Elbow Plot Evolutionary Distinctiveness}
-elbow_plot(data = z_score_df, variable = "mean_evol_dist", k_max = 5)
+``` {r Elbow Plot Evolutionary Distinctiveness, fig.width = 8, fig.height = 6}
+evol_elbow <- elbow_plot(data = z_score_df, variable = "mean_evol_dist", k_max = 5, ggplot = TRUE)
+
+print(evol_elbow)
 ```
 
 ### Functional Distinctiveness Eblow: K = 2
-``` {r Elbow Plot Functional Distinctiveness}
-elbow_plot(data = z_score_df, variable = "fun_dist", k_max = 5)
+``` {r Elbow Plot Functional Distinctiveness, fig.width = 8, fig.height = 6}
+fun_elbow <- elbow_plot(data = z_score_df, variable = "fun_dist", k_max = 5, ggplot = TRUE)
+
+print(fun_elbow)
 ```
 
 ## Determine Eco-evolutionary Rarity Status

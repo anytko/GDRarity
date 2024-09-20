@@ -24,25 +24,38 @@
 #' @export
 #'
 fun_dist <- function(data_frame, trait_columns) {
+  # Check if the data frame is empty
+  if (nrow(data_frame) == 0) {
+    stop("Error: The data frame is empty.")
+  }
+  
+  # Check if there are at least 2 traits
+  if (length(trait_columns) < 2) {
+    stop("Error: At least 2 traits are required for functional distinctiveness calculation.")
+  }
+  
   # Extract trait values
   trait_data <- data_frame[, trait_columns]
-
+  
   # Z-transform based on the median
   trait_data <- scale(data_frame[, trait_columns], center = apply(trait_data, 2, median))
-
+  
   # Calculate Euclidean distances
   distances <- vegan::vegdist(trait_data, method = "euclidean")
-
+  
   # Calculate functional distinctiveness
   fd_values <- rowMeans(as.matrix(distances))
-
+  
   # Create a new dataframe with species names and FD values
   result_df <- data.frame(species_name = data_frame$species_name, fun_dist = fd_values)
-
+  
   # Join the FD values to the initial dataset
   joined_data <- merge(data_frame, result_df, by = "species_name", all.x = TRUE)
-
+  
   return(joined_data)
 }
+
+
+
 
 

@@ -11,7 +11,7 @@
 #' 
 #' @examples
 #' Generate a test dataframe with species Abies cephalonica
-#' test_data <- data.frame(species_name = c("Abies_cephalonica"))
+#' test_data <- data.frame(species_name = c("Acer_campestre"))
 #' Retrieve the unclipped range convex hulls 
 #' unclipped_hulls <- get_range_convex_hulls(test_data)
 #' # Get continent data from a GeoJSON file
@@ -61,4 +61,3 @@ clip_polygons_to_land <- function(convex_hulls, continent_sf) {
   
   return(clipped_polygons_list)
 }
-

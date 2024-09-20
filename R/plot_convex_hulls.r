@@ -15,6 +15,15 @@
 #' @export
 #' 
 plot_convex_hulls <- function(convex_hulls) {
+
+  if (length(convex_hulls) == 0) {
+    # Create an empty leaflet map
+    m <- leaflet() %>%
+      addTiles() %>%
+      setView(lng = 0, lat = 0, zoom = 2)  # Set initial view to world
+    print(m)
+    return(m)  # Return the empty map
+  }
   # Extract species names from the names of the list
   species_names <- names(convex_hulls)
   
@@ -69,9 +78,3 @@ plot_convex_hulls <- function(convex_hulls) {
   # Print the map
   print(m)
 }
-
-
-
-
-
-

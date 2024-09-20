@@ -17,10 +17,10 @@
 #' @import utils
 #' @examples
 #' # Generate a test dataframe with species Abies cephalonica
-#' test_data <- data.frame(species_name = c("Abies_cephalonica"))
+#' test_data <- data.frame(species_name = c("Betula_humilis"))
 #' 
 #' # Generate range sizes for each speices
-#' range_size <- calc_range_size(data_frame = test_data)
+#' range_size <- calc_range_size(data_frame = test_data, min_points = 4)
 #' print(range_size)
 #' @export
 #' 
@@ -33,7 +33,7 @@ calc_range_size <- function(data_frame, num_cores = 1, min_points = 5, min_dista
     
     # Use the provided continent file or default to the Natural Earth continent boundaries
     if (is.null(continent_file)) {
-      continent_sf <- get_continent_sf("https://d2ad6b4ur7yvpq.cloudfront.net/naturalearth-3.3.0/ne_50m_admin_0_countries.geojson")
+      continent_sf <- get_continent_sf()
     } else {
       continent_sf <- st_read(continent_file)  # Load the user-provided continent file
     }
@@ -61,7 +61,4 @@ calc_range_size <- function(data_frame, num_cores = 1, min_points = 5, min_dista
   
   return(result_df)
 }
-
-
-
 
