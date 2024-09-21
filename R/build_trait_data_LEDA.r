@@ -76,7 +76,6 @@ build_trait_data_LEDA <- function(columns_to_select, genera = NULL) {
   # Subset based on the selected columns
   result <- result %>% select(all_of(c("species_name", columns_to_select)))
 
-  View(result)
   return(result)
 }
 
