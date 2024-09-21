@@ -61,13 +61,14 @@ devtools::install_github("anytko/GeoFunPhy")
 
 ## Example
 
-This is a basic example which demonstrates GeoFunPhy useage and shows how you can determine the eco-evolutionary status of common tree genera using SLA, seed_mass, and canopy_height. Note that certain functions, such as check_continents(), check_biomes(), and those called by calc_range_size() are not included. Please see the GeoFunPhy vignette for more information on extra functionality.
+This is a basic example which demonstrates GeoFunPhy useage and shows how you can determine the eco-evolutionary status of common tree genera using SLA, seed_mass, and canopy_height. Note that certain functions, such as those called by calc_range_size() are not included (i.e. get_range_convex_hulls() and clip_polygons_to_land()). Please see the GeoFunPhy vignette for a comprehensive example more information on extra functionality.
 
 ``` {r message=FALSE, warning=FALSE}
 library(GeoFunPhy)
 ```
 
 ## Create Trait Dataframe
+
 ``` {r Create Trait Dataframe, results='asis'}
 trait_df <- build_trait_data_LEDA(columns_to_select = c("SLA", "seed_mass", "canopy_height"), genera = c("Acer_", "Pinus_", "Fraxinus_", "Quercus_", "Tsuga_", "Ulmus", "Populus", "Betula_"))
 ```

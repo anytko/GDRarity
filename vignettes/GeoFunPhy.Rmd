@@ -37,9 +37,19 @@ options(rgl.useNULL = TRUE)
 ```{r Create Trait Dataframe, results='asis'}
 trait_df <- build_trait_data_LEDA(columns_to_select = c("SLA", "seed_mass", "leaf_mass", "canopy_height"), genera = c("Acer_", "Pinus_", "Fraxinus_", "Quercus_", "Tsuga_", "Solidago_", "Ulmus", "Populus", "Rhododendron_", "Betula_"))
 
-DT::datatable(trait_df)
 ```
 
+```{r Display Trait Dataframe, echo=FALSE}
+DT::datatable(
+  trait_df,
+  options = list(
+    scrollX = TRUE,     # Enable horizontal scrolling
+    scrollY = "400px",  # Set the table height with vertical scrolling
+    pageLength = 10     # Set the number of rows to display per page
+  ),
+  width = "100%"
+)
+```
 
 ## Input Phylogeny
 Users can input their own phylogeny or use one of the four phylogeneies listed in Smith & Brown 2018 including: 
@@ -59,7 +69,15 @@ species_range_size <- calc_range_size(data_frame = trait_df, min_points = 4, gbi
 ```
 
 ```{r Display Range Size Table, echo=FALSE}
-DT::datatable(species_range_size)
+DT::datatable(
+  species_range_size,
+  options = list(
+    scrollX = TRUE,     # Enable horizontal scrolling
+    scrollY = "400px",  # Set the table height with vertical scrolling
+    pageLength = 10     # Set the number of rows to display per page
+  ),
+  width = "100%"
+)
 ```
 
 ## Calculate Range Size *step-by-step
@@ -88,7 +106,15 @@ range_sizes_step <- range_sizes(clipped_hulls)
 
 
 ```{r Display Range Size Table Step, echo=FALSE}
-DT::datatable(range_sizes_step)
+DT::datatable(
+  range_sizes_step,
+  options = list(
+    scrollX = TRUE,     # Enable horizontal scrolling
+    scrollY = "400px",  # Set the table height with vertical scrolling
+    pageLength = 10     # Set the number of rows to display per page
+  ),
+  width = "100%"
+)
 ```
 
 ## Find which continents contain each species' convex hulls
@@ -96,8 +122,16 @@ DT::datatable(range_sizes_step)
 continents <- check_continents(clipped_hulls, continent_bounds)
 ```
 
-```{r Display Continent Table , echo=FALSE}
-DT::datatable(continents)
+```{r Display Continent Table, echo=FALSE}
+DT::datatable(
+  continents,
+  options = list(
+    scrollX = TRUE,     # Enable horizontal scrolling
+    scrollY = "400px",  # Set the table height with vertical scrolling
+    pageLength = 10     # Set the number of rows to display per page
+  ),
+  width = "100%"
+)
 ```
 
 ## Find which biomes contain each species' convex hulls
@@ -105,16 +139,35 @@ DT::datatable(continents)
 biomes <- check_biomes(clipped_hulls)
 ```
 
-```{r Display Biomes Table , echo=FALSE}
-DT::datatable(biomes)
+```{r Display Biomes Table, echo=FALSE}
+DT::datatable(
+  biomes,
+  options = list(
+    scrollX = TRUE,     # Enable horizontal scrolling
+    scrollY = "400px",  # Set the table height with vertical scrolling
+    pageLength = 10     # Set the number of rows to display per page
+  ),
+  width = "100%"
+)
 ```
-
 
 ## Calculate Evolutionary Distinctiveness
 
 ```{r Calculate Evolutionary Distinctiveness, results='asis', message=FALSE, warning=FALSE}
 evol_df <- avg_evol_dist(data_frame = trait_df, phy = GBMB_phylogeny, time_slices = c(10, 25, 50), num_cores = 6)
 DT::datatable(evol_df)
+```
+
+```{r Display Evolutionary Distinctiveness Table, echo=FALSE}
+DT::datatable(
+  evol_df,
+  options = list(
+    scrollX = TRUE,     # Enable horizontal scrolling
+    scrollY = "400px",  # Set the table height with vertical scrolling
+    pageLength = 10     # Set the number of rows to display per page
+  ),
+  width = "100%"
+)
 ```
 
 ## Calculate Functional Distinctiveness
@@ -128,14 +181,36 @@ merged_df <- na.omit(merged_df)
 
 ```{r Calculate Functional Distinctiveness, results='asis'}
 fun_evol_range_df <- fun_dist(data_frame = merged_df, trait_columns = c("SLA", "seed_mass", "leaf_mass", "canopy_height"))
-DT::datatable(fun_evol_range_df)
+```
+
+```{r Display Functional Distinctiveness Table, echo=FALSE}
+DT::datatable(
+  fun_evol_range_df,
+  options = list(
+    scrollX = TRUE,     # Enable horizontal scrolling
+    scrollY = "400px",  # Set the table height with vertical scrolling
+    pageLength = 10     # Set the number of rows to display per page
+  ),
+  width = "100%"
+)
 ```
 
 ## Z Transform Dataframe 
 
 ```{r Z Transform Dataframe, results='asis'}
 z_score_df <- scale_by_median(data_frame = fun_evol_range_df, columns_chosen = c("range_size", "mean_evol_dist"))
-DT::datatable(z_score_df)
+```
+
+```{r Display Scaled Data Table, echo=FALSE}
+DT::datatable(
+  z_score_df,
+  options = list(
+    scrollX = TRUE,     # Enable horizontal scrolling
+    scrollY = "400px",  # Set the table height with vertical scrolling
+    pageLength = 10     # Set the number of rows to display per page
+  ),
+  width = "100%"
+)
 ```
 
 ## Create Elbow Plots to Detmine Optimal K Means
@@ -169,7 +244,15 @@ EER_stat_df <- check_EER_status_k(data_frame = z_score_df, range_size_col = "ran
 ```
 
 ```{r Display EER Status Table, echo=FALSE}
-DT::datatable(EER_stat_df)
+DT::datatable(
+  EER_stat_df,
+  options = list(
+    scrollX = TRUE,     # Enable horizontal scrolling
+    scrollY = "400px",  # Set the table height with vertical scrolling
+    pageLength = 10     # Set the number of rows to display per page
+  ),
+  width = "100%"
+)
 ```
 
 ## Visualizing Eco-evolutionary Status 

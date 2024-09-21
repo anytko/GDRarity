@@ -61,9 +61,10 @@ You can install the development version of GeoFunPhy like so:
 This is a basic example which demonstrates GeoFunPhy useage and shows
 how you can determine the eco-evolutionary status of common tree genera
 using SLA, seed\_mass, and canopy\_height. Note that certain functions,
-such as check\_continents(), check\_biomes(), and those called by
-calc\_range\_size() are not included. Please see the GeoFunPhy vignette
-for more information on extra functionality.
+such as those called by calc\_range\_size() are not included
+(i.e. get\_range\_convex\_hulls() and clip\_polygons\_to\_land()).
+Please see the GeoFunPhy vignette for a comprehensive example more
+information on extra functionality.
 
     library(GeoFunPhy)
 

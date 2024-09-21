@@ -18,3 +18,4 @@ Suggests:
 VignetteBuilder: knitr
 Config/testthat/edition: 3
 DataImport: species_data.csv
+URL: https://anytko.github.io/GeoFunPhy/
