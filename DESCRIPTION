@@ -1,7 +1,7 @@
 Package: GeoFunPhy
 Title: Analysis of Ecological and Evolutionary Rarity Status
 Version: 0.0.0.9000
-Imports: Rdpack, ape, dplyr, tidyr, stringr, rgbif, rgl, magrittr, purrr, treeio, vegan, datasets, base, dbscan, foreach, doParallel, sf, tibble, utils, future, future.apply, geojsonio, ggplot2, leaflet, picante, rmapshaper
+Imports: Rdpack, ape, dplyr, tidyr, stringr, rgbif, rgl, magrittr, purrr, treeio, vegan, datasets, base, dbscan, foreach, doParallel, sf, tibble, utils, future, future.apply, geojsonio, ggplot2, leaflet, picante, rmapshaper, DT
 RdMacros: Rdpack
 Authors@R: 
     person("Alivia", "Nytko", , "anytko@vols.utk.edu", role = c("aut", "cre"),
