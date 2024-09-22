@@ -1,0 +1,9 @@
+pandoc: 3.1.11
+pkgdown: 2.1.1
+pkgdown_sha: ~
+articles:
+  GeoFunPhy: GeoFunPhy.html
+last_built: 2024-09-22T18:10Z
+urls:
+  reference: https://anytko.github.io/GeoFunPhy/reference
+  article: https://anytko.github.io/GeoFunPhy/articles
