@@ -20,6 +20,7 @@
 #' @import treeio
 #' @import doParallel
 #' @import foreach
+#' @import phytools
 #' 
 #' @examples 
 #' 
