@@ -59,7 +59,7 @@ avg_evol_dist <- function(phy, data_frame, taxon = NULL, time_slices = c(25, 50,
   }
 
   # Prune the phylogeny based on species names in the dataframe
-  pruned_phy <- drop.tip(phy, setdiff(phy$tip.label, taxon))
+  pruned_phy <- ape::drop.tip(phy, setdiff(phy$tip.label, taxon))
 
   # Check if pruning removed all tips or the object is no longer a valid phylo object
   if (is.null(pruned_phy) || !inherits(pruned_phy, "phylo")) {
