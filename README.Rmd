@@ -14,6 +14,8 @@ library(tibble)
 library(rgl)
 ```
 
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.13845718.svg)](https://doi.org/10.5281/zenodo.13845718)
+
 # GeoFunPhy
 
 <!-- badges: start -->
@@ -69,7 +71,7 @@ library(GeoFunPhy)
 
 ## Create Trait Dataframe
 
-``` {r Create Trait Dataframe, results='asis'}
+``` {r Create Trait Dataframe, results='asis', eval=FALSE}
 trait_df <- build_trait_data_LEDA(columns_to_select = c("SLA", "seed_mass", "canopy_height"), genera = c("Acer_", "Pinus_", "Fraxinus_", "Quercus_", "Tsuga_", "Ulmus", "Populus", "Betula_"))
 ```
 

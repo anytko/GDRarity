@@ -1,5 +1,7 @@
 <!-- README.md is generated from README.Rmd. Please edit that file -->
 
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.13845718.svg)](https://doi.org/10.5281/zenodo.13845718)
+
 # GeoFunPhy
 
 <!-- badges: start -->
