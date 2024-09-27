@@ -3,7 +3,7 @@ pkgdown: 2.1.1
 pkgdown_sha: ~
 articles:
   GeoFunPhy: GeoFunPhy.html
-last_built: 2024-09-26T23:43Z
+last_built: 2024-09-27T01:04Z
 urls:
   reference: https://anytko.github.io/GeoFunPhy/reference
   article: https://anytko.github.io/GeoFunPhy/articles
