@@ -75,6 +75,7 @@
 <li>plot_convex_hulls() plots species’ occurence polygons onto a world map -plot_clipped_hulls() plots species’ clipped occurence polygons (clipped to continent bounds) onto a world map</li>
 <li>range_poly_map() creates and plots species’ occurence polygons onto a world map</li>
 <li>plot_EER_status() visualizes eco-evolutionary rarity categories in 3D space</li>
+<li>build_treemap() visualizes eco-evolutionary rarity categories using a treemap</li>
 </ul>
 </div>
 <div class="section level2">
@@ -179,8 +180,10 @@
 <div class="section level2">
 <h2 id="visualizing-eco-evolutionary-rarity-status">Visualizing Eco-evolutionary Rarity Status<a class="anchor" aria-label="anchor" href="#visualizing-eco-evolutionary-rarity-status"></a>
 </h2>
-<p>We can map the EER of species from this dataframe onto interactive 3D space. This object can be manipulated and positioned by the user in order to best visualize the respective ecological statuses.</p>
-<div class="sourceCode" id="cb13"><pre class="sourceCode R"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" tabindex="-1"></a>figure <span class="ot">&lt;-</span> <span class="fu">plot_EER_status</span>(<span class="at">data_frame =</span> eco_stat_df, <span class="at">fun_dist =</span> <span class="st">"fun_dist"</span>, <span class="at">evol_dist =</span> <span class="st">"mean_evol_dist"</span>, <span class="at">range_size =</span> <span class="st">"range_size"</span>)</span></code></pre></div>
+<p>We can map the EER of species from this dataframe onto 2D and interactive 3D space. This object can be manipulated and positioned by the user in order to best visualize the respective ecological statuses.</p>
+<div class="sourceCode" id="cb13"><pre class="sourceCode R"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" tabindex="-1"></a>tree_map <span class="ot">&lt;-</span> <span class="fu">build_treemap</span>(eco_stat_df)</span>
+<span id="cb13-2"><a href="#cb13-2" tabindex="-1"></a></span>
+<span id="cb13-3"><a href="#cb13-3" tabindex="-1"></a>figure <span class="ot">&lt;-</span> <span class="fu">plot_EER_status</span>(<span class="at">data_frame =</span> eco_stat_df, <span class="at">fun_dist =</span> <span class="st">"fun_dist"</span>, <span class="at">evol_dist =</span> <span class="st">"mean_evol_dist"</span>, <span class="at">range_size =</span> <span class="st">"range_size"</span>)</span></code></pre></div>
 </div>
 </div>
 
