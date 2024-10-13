@@ -257,7 +257,19 @@ DT::datatable(
 
 ## Visualizing Eco-evolutionary Status 
 
-We can map the ecological statuses of species from the large dataframe onto interactive 3D space. This object can be manipulated and positioned by the user in order to best visualize the respective ecological statuses. 
+We can map the ecological statuses of species from the large dataframe onto 2D or interactive 3D space. This object can be manipulated and positioned by the user in order to best visualize the respective ecological statuses. 
+
+### 2D Visualization of rarity using a treemap 
+
+```{r Create 2d Visualiziation}
+tree_map <- build_treemap(data_frame = EER_stat_df, plot = TRUE)
+```
+
+```{r Plot 2d Visualiziation, out.width="100%", fig.dim = c(6, 6)}
+tree_map
+```
+
+### 3D Visualization of rarity using rglwidget
 
 <style>
   /* Adjust the dimensions as needed */

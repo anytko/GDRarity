@@ -52,6 +52,7 @@ organismal strategy.
 -plot_clipped_hulls() plots species' clipped occurence polygons (clipped to continent bounds) onto a world map
 - range_poly_map() creates and plots species' occurence polygons onto a world map 
 - plot_EER_status() visualizes eco-evolutionary rarity categories in 3D space
+- build_treemap() visualizes eco-evolutionary rarity categories using a treemap
 
 ## Installation
 
@@ -164,7 +165,11 @@ eco_stat_df <- check_EER_status_k(data_frame = scaled_df, range_size_col = "rang
 
 ## Visualizing Eco-evolutionary Rarity Status 
 
-We can map the EER of species from this dataframe onto interactive 3D space. This object can be manipulated and positioned by the user in order to best visualize the respective ecological statuses. 
+We can map the EER of species from this dataframe onto 2D and interactive 3D space. This object can be manipulated and positioned by the user in order to best visualize the respective ecological statuses. 
+
+``` {r Create 2d Visualization, eval=FALSE}
+tree_map <- build_treemap(eco_stat_df)
+```
 
 
 ``` {r Create 3d Visualization, out.width="100%", fig.dim = c(6, 6), fig.show='hide', eval=FALSE}

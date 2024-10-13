@@ -51,6 +51,8 @@ larger organismal strategy.
     onto a world map
 -   plot\_EER\_status() visualizes eco-evolutionary rarity categories in
     3D space
+-   build\_treemap() visualizes eco-evolutionary rarity categories using
+    a treemap
 
 ## Installation
 
@@ -151,8 +153,10 @@ species with NA values for any trait.
 
 ## Visualizing Eco-evolutionary Rarity Status
 
-We can map the EER of species from this dataframe onto interactive 3D
-space. This object can be manipulated and positioned by the user in
-order to best visualize the respective ecological statuses.
+We can map the EER of species from this dataframe onto 2D and
+interactive 3D space. This object can be manipulated and positioned by
+the user in order to best visualize the respective ecological statuses.
+
+    tree_map <- build_treemap(eco_stat_df)
 
     figure <- plot_EER_status(data_frame = eco_stat_df, fun_dist = "fun_dist", evol_dist = "mean_evol_dist", range_size = "range_size")

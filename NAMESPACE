@@ -2,6 +2,7 @@
 
 export(avg_evol_dist)
 export(build_trait_data_LEDA)
+export(build_treemap)
 export(calc_range_size)
 export(check_EER_status_k)
 export(check_biomes)
@@ -45,3 +46,5 @@ import(treeio)
 import(utils)
 import(vegan)
 importFrom(Rdpack,reprompt)
+importFrom(treemapify,geom_treemap)
+importFrom(treemapify,geom_treemap_text)
