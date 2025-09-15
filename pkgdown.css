@@ -1,0 +1,5 @@
+/* Move the page-header logo up */
+.page-header img.logo {
+    margin-top: -50px;  /* adjust this value as needed */
+    height: 120px;      /* optional: resize */
+  }

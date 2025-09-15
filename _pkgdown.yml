@@ -3,7 +3,7 @@ url: https://anytko.github.io/GDRarity/
 template:
   bootstrap: 5
   params:
-    logo: man/figures/logo.png
+    #logo: man/figures/logo.png
 
 home:
   title: ""

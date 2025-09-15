@@ -1,7 +1,7 @@
 
 <p style="font-size: 2.5em; font-weight: bold; margin-bottom: 0;">
 GDRarity
-<img src="man/figures/logo.png" align="right" width="120" alt="GDRarity logo"/>
+<img src="vignettes/logo.png" align="right" width="120" alt="GDRarity logo"/>
 </p>
 
 # An R package for the Global Model of Discretized Rarity

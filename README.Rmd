@@ -3,7 +3,7 @@ output: github_document
 ---
 
 <p style="font-size: 2.5em; font-weight: bold; margin-bottom: 0;">
-  GDRarity <img src="man/figures/logo.png" align="right" width="120" alt="GDRarity logo"/>
+  GDRarity <img src="vignettes/logo.png" align="right" width="120" alt="GDRarity logo"/>
 </p>
 
 
