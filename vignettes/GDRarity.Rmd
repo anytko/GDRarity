@@ -1,0 +1,195 @@
+---
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{GDRarity}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+<style>
+.page-header {
+  display: none;
+}
+body {
+  padding-top: 0 !important;
+  margin-top: 0 !important;
+}
+img[align="right"] {
+  border: none;
+  background: transparent
+}
+</style>
+
+<p style="font-size: 2.5em; font-weight: bold; margin-bottom: 0;">
+  GDRarity <img src="logo.png" align="right" width="120" />
+</p>
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+## Vignette Info
+
+This vignette provides an introduction to the usage of **GDRarity**.
+
+We will:
+
+1. Find the best restriction and accompanying method to explain variation in flowering phenology for 70 British plant species.
+2.  Analyse the rarity of species using this restriction.
+
+## Setup
+```{r setup, warning=FALSE, message=FALSE}
+library(GDRarity)
+```
+
+```{r other setup, warning=FALSE, message=FALSE, echo=FALSE}
+library(knitr)
+library(DT)
+library(tibble)
+library(dplyr)
+```
+
+## Import Data
+```{r Get data}
+species_70_path <- system.file("extdata", "species_70.csv", package = "GDRarity")
+abundance_70_path <- system.file("extdata", "abundance_70.csv", package = "GDRarity")
+
+species_70 <- read.csv(species_70_path)
+abundance_70 <- read.csv(abundance_70_path)
+```
+
+## Run All Methods on All 63 Restrictions of GDR
+Only running taxonomic frequency as a measure of regional geographic rarity due to computational requirements associated with calculating range sizes using GBIF.
+```{r Run all methods, message=FALSE, warning=FALSE}
+all_combinations <- restriction_performance_pipeline(species_df = species_70, abundance_df = abundance_70, trait_cols = c("SLA", "seed_mass", "canopy_height"), geo_methods = "taxonomic", response_vars = "flowering_duration")
+```
+
+
+## Output Examples 
+### Results from the first combination of methods
+```{r Combination Example, echo = FALSE} 
+  DT::datatable(
+    all_combinations$combos$results$combo_1,
+    options = list(
+      scrollX = TRUE,
+      scrollY = "400px",
+      pageLength = 10
+    ),
+    width = "100%"
+  )
+```
+
+
+### ANOVA Results for Every Method and Restriction
+```{r Anova Results, echo = FALSE}
+  DT::datatable(
+    all_combinations$anova_results,
+    options = list(
+      scrollX = TRUE,
+      scrollY = "400px",
+      pageLength = 10
+    ),
+    width = "100%"
+  )
+```
+
+### Best Models Explaining Flowering Phenology
+```{r Best Models, echo = FALSE}
+  DT::datatable(
+    all_combinations$best_models,
+    options = list(
+      scrollX = TRUE,
+      scrollY = "400px",
+      pageLength = 10
+    ),
+    width = "100%"
+  )
+```
+
+### Parameter Combinations 
+```{r Parameter Combinations, echo = FALSE}
+  DT::datatable(
+    all_combinations$param_grid,
+    options = list(
+      scrollX = TRUE,
+      scrollY = "400px",
+      pageLength = 10
+    ),
+    width = "100%"
+  )
+```
+
+### Threshold Sets
+```{r Threshold Sets, echo = FALSE}
+  DT::datatable(
+    all_combinations$threshold_sets,
+    options = list(
+      scrollX = TRUE,
+      pageLength = 4
+    ),
+    width = "100%"
+  )
+```
+
+## Best Restriction for Flowering Phenology  
+
+The **best restriction** to explain variation in flowering phenology in the 70 British species is **GLFRPR**, which explains up to **23.2%** of the variation in flowering window and incorporates:  
+
+- **Local Geographic Rarity (GL)** 
+- **Regional Functional Rarity (FR)**  
+- **Regional Phylogenetic Rarity (PR)**  
+
+### Methods Used
+- **Regional Geographic Rarity (GR):** Taxonomic frequency  
+- **Regional Functional Rarity (FR):** Mean Euclidean distance  
+- **Local Phylogenetic Rarity (PR):** Abundance-weighted phylogenetic mean pair-wise distance  
+
+### Thresholds Applied
+- Geographic rarity: **< 15%**  
+- Functional rarity: **> 75%**  
+- Phylogenetic rarity: **> 75%**  
+
+## Incorporating Additional Dimensions 
+#### Additional dimensions of rarity can also be incorporated but must be specified by users
+
+### Example: Adding Random Habitat Specificity
+```{r Add Habitat Specificity}
+set.seed(123) # for reproducibility
+species_70_hs <- species_70
+species_70_hs$habitat_specificity <- runif(nrow(species_70_hs), min = 0, max = 1)
+```
+
+### Re-run Methods with Habitat Specificity
+When using user-specified rarity dimensions, you **must** specify all thresholds and directions.
+```{r Run Habitat Specificity Methods, message=FALSE, warning=FALSE}
+# Must specify all thresholds and directions if using user-specified rarity dimension(s)
+hs_combinations <- restriction_performance_pipeline(species_df = species_70_hs, abundance_df = abundance_70, additional_dimensions = "habitat_specificity", trait_cols = c("SLA", "seed_mass", "canopy_height"), geo_methods = "taxonomic", response_vars = "flowering_duration", threshold_sets = list(list(GR = 0.15, GL = 0.15, FR = 0.75, FL = 0.75, PR = 0.75, PL = 0.75, H = 0.85)), direction_sets = list(list(GR = "low", GL = "low", FR = "high", FL = "high", PR = "high", PL = "high", H = "high")))
+```
+
+
+### Best Models with Habitat Specificity
+```{r Best Model with Habitat Specificity, echo = FALSE}
+  DT::datatable(
+    hs_combinations$best_models,
+    options = list(
+      scrollX = TRUE,
+      scrollY = "400px",
+      pageLength = 10
+    ),
+    width = "100%"
+  )
+```
+
+
+## Best Restriction for Flowering Phenology Incorporating Habitat Specificity 
+
+The **best restriction** to explain variation in flowering phenology in the 70 British species incorporating a user-specified axis of habitat specificity is **GLFRLPRH**, which explains up to **78.6%** of the variation in flowering window and incorporates:  
+
+- **Local Geographic Rarity (GL)** 
+- **Regional Functional Rarity (FR)**  
+- **Local Functional Rarity (FL)**
+- **Regional Phylogenetic Rarity (PR)**  
+- **Habitat Specificity (H)**  

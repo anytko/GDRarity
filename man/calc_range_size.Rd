@@ -6,6 +6,7 @@
 \usage{
 calc_range_size(
   data_frame,
+  species_col = "species_name",
   num_cores = 1,
   min_points = 5,
   min_distance = 1,
@@ -16,6 +17,8 @@ calc_range_size(
 \arguments{
 \item{data_frame}{A \code{data.frame} containing scienfic names of species with a column named \code{species_name}.}
 
+\item{species_col}{A character string indicating the column in \code{data_frame} that contains species names. Default is \code{"species_name"}.}
+
 \item{num_cores}{The number of cores to use for parallel processing. Default is 1 (no parallel processing).}
 
 \item{min_points}{The minimum number of points required to form a range cluster. Default is 5.}
@@ -24,19 +27,40 @@ calc_range_size(
 
 \item{gbif_limit}{The maximum number of GBIF records to retrieve per species. Default is 2000.}
 
-\item{continent_file}{The URL of a GeoJSON or shape (.shp & .shx) file containing country or continent data. Default is NULL - If \code{NULL}, a GeoJSON file from Natural Earth will be used.}
+\item{continent_file}{Optional path or URL to a GeoJSON or shapefile
+(\code{.shp} and \code{.shx}) containing continent or country boundaries.
+If \code{NULL} (default), Natural Earth continent data is retrieved via
+\code{\link[=get_continent_sf]{get_continent_sf()}}.}
 }
 \value{
-A \code{data.frame} with two columns: \code{species_name} and \code{range_size}. The \code{range_size} column represents the size of the range for each species in square kilometers.
+A \code{data.frame} with two columns:
+\itemize{
+\item \code{species_col} — species name.
+\item \code{range_size} — total range size in square kilometers.
+}
 }
 \description{
 This function calculates the range sizes (sq km) of multiple species by retrieving occurrence data from GBIF, generating convex hulls, and clipping them to continent boundaries. It uses parallel processing to handle multiple species efficiently.
 }
+\details{
+This function wraps the following internal steps:
+\enumerate{
+\item Retrieves GBIF occurrence data via \code{\link[=get_range_convex_hulls]{get_range_convex_hulls()}}.
+\item Reads continent boundaries via \code{\link[=get_continent_sf]{get_continent_sf()}} or from a user-supplied file.
+\item Clips convex hull polygons to land boundaries using \code{\link[=clip_polygons_to_land]{clip_polygons_to_land()}}.
+\item Calculates total polygon area (km²) per species using \code{\link[=range_sizes]{range_sizes()}}.
+}
+
+Parallelization is handled via \strong{future} and \strong{future.apply}.
+Each species is processed independently and requires internet accesss.
+}
 \examples{
 # Generate a test dataframe with species Abies cephalonica
-test_data <- data.frame(species_name = c("Betula_humilis"))
+\dontrun{
+test_data <- data.frame(species = c("Abies cephalonica"))
 
 # Generate range sizes for each speices
-range_size <- calc_range_size(data_frame = test_data, min_points = 4)
+range_size <- calc_range_size(data_frame = test_data, min_points = 4, species_col = "species")
 print(range_size)
+}
 }

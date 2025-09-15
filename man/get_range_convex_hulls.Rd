@@ -6,6 +6,7 @@
 \usage{
 get_range_convex_hulls(
   data_frame,
+  species_col = "species_name",
   species_name = NULL,
   num_cores = 1,
   min_points = 5,
@@ -15,6 +16,8 @@ get_range_convex_hulls(
 }
 \arguments{
 \item{data_frame}{A dataframe containing scientific names of species. Must include a column named \code{species_name}.}
+
+\item{species_col}{Character string specifying the column in \code{data_frame} that contains species names. Default is \code{"species_name"}.}
 
 \item{species_name}{An optional character vector of species names to process. Default is NULL. If \code{NULL}, all species in the dataframe are processed.}
 
@@ -27,15 +30,28 @@ get_range_convex_hulls(
 \item{gbif_limit}{The maximum number of GBIF records to retrieve per species. Default is 2000.}
 }
 \value{
-A nested list of convex hull polygons for each species. Each species name corresponds to a list of \code{sf} objects representing the convex hulls.
+A named list where each element corresponds to a species and contains a list of \code{sf} polygon objects representing convex hulls.
 }
 \description{
-This function gathers, cleans, and clusters GBIF data to create convex hulls of species ranges.
+Retrieves occurrence data for species from GBIF, clusters spatial points using DBSCAN, and generates convex hull polygons for each cluster.
+}
+\details{
+The function:
+\enumerate{
+\item Retrieves occurrence records from GBIF using \code{\link[rgbif:occ_search]{rgbif::occ_search()}}.
+\item Filters and cleans records (removing invalid coordinates, duplicates, and certain basis of record types).
+\item Clusters spatial points using \code{\link[dbscan:dbscan]{dbscan::dbscan()}} with \code{eps = min_distance} and \code{minPts = min_points}.
+\item Computes convex hull polygons for each cluster using \code{sf::st_convex_hull()}.
+}
+
+Parallelization is handled via \code{\link[parallel:mclapply]{parallel::mclapply()}} when \code{num_cores > 1}.
 }
 \examples{
 # Generate a test dataframe with species Abies cephalonica
+\dontrun{
 test_data <- data.frame(species_name = c("Abies_cephalonica"))
 # Retrieve the unclipped range polygons 
 unclipped_hulls <- get_range_convex_hulls(test_data)
 print(unclipped_hulls)
+}
 }

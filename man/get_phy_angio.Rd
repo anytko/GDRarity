@@ -7,26 +7,29 @@
 get_phy_angio(phy_choice)
 }
 \arguments{
-\item{phy_choice}{Choice of seed phylogeny includes ALLMB, ALLOTB, GBMB, GBOTB}
+\item{phy_choice}{Character string specifying which seed plant phylogeny to download.
+Must be one of:
+\itemize{
+\item \code{"ALLMB"}: GenBank and Open Tree of Life taxa with a backbone from Magallón et al. (2015)
+\item \code{"ALLOTB"}: GenBank and Open Tree of Life taxa with a backbone from Open Tree of Life version 9.1
+\item \code{"GBMB"}: GenBank taxa with a backbone from Magallón et al. (2015)
+\item \code{"GBOTB"}: GenBank taxa with a backbone from Open Tree of Life version 9.1
+}}
 }
 \value{
-A rooted phylogenetic object to be used in comparative methods
+A rooted phylogenetic tree as a \code{phylo} object to be used in comparative methods
 }
 \description{
 Retreive seed plant phylogenies described in Smith & Brown 2018 from FePhyFoFum in github
 }
 \details{
-The function downloads a pre-constructed phylogenetic tree from the 'big_seed_plant_trees' repository on GitHub.
-
-The available tree choices are as follows:
-\itemize{
-\item 'ALLMB': GenBank and Open Tree of Life taxa with a backbone provided by Magallón et al. 2015
-\item 'ALLOTB': GenBank and Open Tree of Life taxa with a backbone provided by Open Tree of Life version 9.1
-\item 'GBMB': GenBank taxa with a backbone provided by Magallón et al. 2015
-\item 'GBOTB': GenBank taxa with a backbone provided by Open Tree of Life version 9.1
-}
+The function downloads a pre-constructed phylogenetic tree from the
+\href{https://github.com/FePhyFoFum/big_seed_plant_trees}{big_seed_plant_trees}
+GitHub repository, unzips it to a temporary directory, and reads the \code{.tre} file
+corresponding to the selected \code{phy_choice}.
 }
 \examples{
+\dontrun{
 ALLMB_phy <- get_phy_angio(phy_choice = "ALLMB")
 
 ALLOTB_phy <- get_phy_angio(phy_choice = "ALLOTB")
@@ -34,14 +37,13 @@ ALLOTB_phy <- get_phy_angio(phy_choice = "ALLOTB")
 GMBM_phy <- get_phy_angio(phy_choice = "GBMB")
 
 GBOTB_phy <- get_phy_angio(phy_choice = "GBOTB")
+}
 
 }
 \references{
-\insertRef{smithbrown2018}{GeoFunPhy}
-
-\insertRef{kleyer2008}{GeoFunPhy}
-
-\insertRef{Magallon2015}{GeoFunPhy}
+\insertRef{smithbrown2018}{GDRarity}
+\insertRef{kleyer2008}{GDRarity}
+\insertRef{Magallon2015}{GDRarity}
 }
 \author{
 Alivia G Nytko, \email{anytko@vols.utk.edu}

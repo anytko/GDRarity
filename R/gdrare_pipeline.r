@@ -1,0 +1,131 @@
+#' Global Discretized Rarity Pipeline
+#'
+#' Runs the full global model of discretized rarity (GDR) and its restrictions for a set of species, from model preparation to rarity axis calculation to final rarity type assignment.
+#'
+#' @param species_df A data frame containing species-level data, including species names and optionally trait, abundance, or site information.
+#' @param species_col The name of the column in \code{species_df} containing species names. Default is \code{"species"}.
+#' @param abundance_df Optional data frame containing site-by-species abundance data.
+#' @param abundance Logical; if \code{TRUE}, include abundance weighting when calculating community rarity metrics. Default is \code{TRUE}.
+#' @param phylo A phylogenetic tree of class \code{phylo}. If \code{NULL} and \code{use_internal_phylo = TRUE}, a default phylogeny will be used.
+#' @param use_internal_phylo Logical; if \code{TRUE} (default) and no \code{phylo} is provided, the function will attempt to retrieve an internal seed plant phylogeny.
+#' @param internal_phylo_name Character; name of the internal tree to use (e.g., \code{"ALLMB"}).
+#' @param trait_cols Character vector specifying the trait columns in \code{species_df} to be used in functional rarity calculations.
+#' @param additional_dimensions Optional list of additional custom rarity axes to include in the analysis.
+#' @param use_most_complete_model Logical; if \code{TRUE}, prioritize using the rarity model that maximizes species coverage across all rarity dimensions. Default is \code{FALSE}.
+#' @param geo_rarity_method Method to calculate geographic rarity. Options: \code{"taxonomic"} (based on site occupancy), or \code{"range"} (based on convex hull/range size). Default is \code{"taxonomic"}.
+#' @param fun_rarity_method Method for functional rarity. Options: \code{"min_distance"}, \code{"mean_distance"}, or \code{"none"} to exclude functional rarity. Default is \code{"min_distance"}.
+#' @param k_means Logical; if \code{TRUE}, use k-means clustering to define rarity thresholds. Default is \code{FALSE}.
+#' @param time Logical; if \code{TRUE}, run rarity analyses for each time slice (e.g., for paleo data). Default is \code{FALSE}.
+#' @param time_slices Optional vector of time points to use if \code{time = TRUE}.
+#' @param relative Logical; whether to use relative distinctiveness or rarity scores (e.g., scaled within communities). Default is \code{TRUE}.
+#' @param min_dbscan_points Minimum number of points required for DBSCAN range calculation. Used when estimating regional geographic rarity from occurrence data. Default is 5.
+#' @param min_dbscan_distance Minimum distance (in decimal degrees) used in DBSCAN-based convex hull calculations. Default is 1.
+#' @param gbif_limit Maximum number of records to pull per species from GBIF when estimating range-based regional geographic rarity. Default is 2000.
+#' @param num_cores Number of cores to use for parallel computation. Default is 1.
+#' @param site_col Column name in \code{abundance_df} that identifies sites. Default is \code{"site"}.
+#' @param abundance_col Column name in \code{abundance_df} that contains species abundance values. Default is \code{"abundance"}.
+#' @param slope_factor A numeric value passed to \code{find_optimal_k()} to adjust the steepness of the elbow curve used for determining optimal number of clusters. Default is 1.
+#' @param model Optional character string naming a specific rarity model to use. If \code{NULL}, models will be inferred based on available data.
+#' @param thresholds A named list of numeric values representing the percentile cutoff for each axis. Default thresholds mark the bottom 15% for geographic rarity and the top 10% for functional and phylogenetic rarity. Custom dimensions of rarity must be thresholded by user.
+#' 
+#' @param directions A named list specifying whether rarity is associated with \code{"low"} or \code{"high"} values for each dimension. If unspecified, the function defaults to \code{"low"} for \code{"GR"} and \code{"GL"}, and \code{"high"} for all other axes. Users can specify only a subset of axes to override the defaults.
+#'
+#' @return A data frame with species-level rarity classifications. This includes raw values and rarity flags for each axis and rarity classifications for each restriction.
+#'
+#' @details
+#' This function is a high-level wrapper that runs the entire GDR workflow. It:
+#' \enumerate{
+#'   \item Prepares rarity restrictions and input data.
+#'   \item Calculates rarity dimensions.
+#'   \item Assigns rarity types.
+#' }
+#'
+#' @seealso
+#' \code{\link[GDRarity]{prepare_gdrarity_models}}, \code{\link[GDRarity]{prepare_gdrarity_axes}}, \code{\link[GDRarity]{assign_rarity_types}}
+#'
+#' @examples
+#' \dontrun{
+#' species <- data.frame(species = c("Abies_procera", "Alnus_incana"), trait1 = c(1.2, 3.4), trait2 = c(1.7, 9.8))
+#' abundance <- data.frame(species = c("Abies_procera", "Alnus_incana", "Abies_procera", "Alnus_incana", "Alnus_incana"), site = c("A", "A", "B", "C", "D"), presence_absence = c(1, 1, 1, 1, 1), abundance = c(10, 5, 15, 3, 7))
+#'
+#' classified <- gdrare_pipeline(species_df = species, abundance_df = abundance, trait_cols = c("trait1", "trait2"), geo_rarity_method = "taxonomic", fun_rarity_method = "mean_distance")
+#'
+#' print(classified)
+#' }
+#'
+#' @author Alivia G. Nytko, \email{anytko@@vols.utk.edu}
+#' @export
+
+gdrare_pipeline <- function(species_df,
+                                     species_col = "species",
+                                     abundance_df = NULL,
+                                     abundance = TRUE,
+                                     phylo = NULL,
+                                     use_internal_phylo = TRUE,
+                                     internal_phylo_name = "ALLMB",
+                                     trait_cols = NULL,
+                                     additional_dimensions = NULL,
+                                     use_most_complete_model = FALSE,
+                                     geo_rarity_method = c("taxonomic", "range"),
+                                     fun_rarity_method = c("min_distance", "mean_distance", "none"),
+                                     k_means = FALSE,
+                                     time = FALSE,
+                                     time_slices = NULL,
+                                     relative = TRUE,
+                                     min_dbscan_points = 5,
+                                     min_dbscan_distance = 1,
+                                     gbif_limit = 2000,
+                                     num_cores = 1,
+                                     site_col = "site",
+                                     abundance_col = "abundance",
+                                     slope_factor = 1,
+                                     model = NULL,
+                                     thresholds = list(
+                                       GR = 0.15, GL = 0.15,
+                                       FR = 0.90, FL = 0.90,
+                                       PR = 0.90, PL = 0.90
+                                     ),
+                                     directions = list(
+                                       GR = "low", GL = "low",
+                                       FR = "high", FL = "high",
+                                       PR = "high", PL = "high"
+                                     )) {
+  
+  # Step 1: Prepare models and metadata
+  model_info <- prepare_gdrarity_models(
+    species_df = species_df,
+    species_col = species_col,
+    abundance_df = abundance_df,
+    phylo = phylo,
+    use_internal_phylo = use_internal_phylo,
+    internal_phylo_name = internal_phylo_name,
+    trait_cols = trait_cols,
+    use_most_complete_model = use_most_complete_model,
+    additional_dimensions = additional_dimensions,
+    model = model
+  )
+  
+  # Step 2: Calculate rarity axes
+  rarity_df <- prepare_gdrarity_axes(
+    models_to_run = model_info$models_to_run,
+    species_df = model_info$species_df,
+    abundance_df = model_info$abundance_df,
+    phylogeny = model_info$phylo,
+    geo_rarity_method = geo_rarity_method,
+    fun_rarity_method = fun_rarity_method,
+    trait_columns = trait_cols,
+    abundance = abundance
+  )
+  
+  # Step 3: Assign rarity groups
+  classified_df <- assign_rarity_types(
+    df = rarity_df,
+    models_to_run = model_info$models_to_run,
+    k_means = k_means,
+    thresholds = thresholds,
+    directions = directions
+  )
+  
+  # Return final classified dataframe (or you can also return intermediate steps)
+  return(classified_df)
+}

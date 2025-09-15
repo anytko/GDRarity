@@ -7,9 +7,10 @@
 build_trait_data_LEDA(columns_to_select, genera = NULL)
 }
 \arguments{
-\item{columns_to_select}{A character vector specifying which traits to select. Options include: SLA (specific leaf area mm^2/mg), seed_mass (mg), leaf_mass (mg), and canopy_height (m)}
+\item{columns_to_select}{A character vector specifying one or more trait columns to include in the output. Valid options are: \code{"SLA"} (specific leaf area, mm^2/mg), \code{"seed_mass"} (mg), \code{"leaf_mass"} (mg), and \code{"canopy_height"} (m).
+The function will return an error if any specified columns are not available.}
 
-\item{genera}{A character vector specifying genera of interest to be filtered. Default is NULL.}
+\item{genera}{Optional character vector specifying genera to filter by. If \code{NULL} (default), no filtering is applied. Genera are matched by underscore notation in species names (e.g., \code{"Acer_"} matches Acer species).}
 }
 \value{
 A dataframe including mean trait data for all species or species of choice in respective columns titled by trait name.
@@ -22,20 +23,20 @@ The function reads trait data from four different data files, including SLA (Spe
 }
 \examples{
 
-Build dataframe using specific leaf area (SLA) trait data across all available species
+# Build dataframe using specific leaf area (SLA) trait data across all available species
 all_traits <- build_trait_data(columns_to_select = "SLA")
 
-Build dataframe using seed mass trait data across maple species
+# Build dataframe using seed mass trait data across maple species
 maple_traits <- build_trait_data(columns_to_select = "seed_mass", genera = "Acer_")
 print(maple_traits)
 
-Build dataframe using canopy height for major tree species
+# Build dataframe using canopy height for major tree species
 tree_traits <- build_trait_data_LEDA(columns_to_select = "canopy_height", genera = c("Acer_", "Quercus_", "Populus_", "Ulmus_", "Pinus_", "Alnus_", "Betula_", "Salix_", "Abies_", "Fraxinus_", "Tsuga_", "Prunus_"))
 print(tree_traits)
 
 }
 \references{
-\insertRef{kleyer2008}{GeoFunPhy}
+\insertRef{kleyer2008}{GDRarity}
 }
 \author{
 Alivia G Nytko, \email{anytko@vols.utk.edu}

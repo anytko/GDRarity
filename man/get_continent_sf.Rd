@@ -7,10 +7,14 @@
 get_continent_sf(url = NULL)
 }
 \arguments{
-\item{url}{Optional URL of a GeoJSON file containing country or continent data. Default is NULL - if NULL the package uses embeded continent boundaries from Natural Earth.}
+\item{url}{Optional URL or file path to a GeoJSON file containing country or continent data. If \code{NULL} (default), the function uses the embedded Natural Earth continent boundaries from the package's \code{extdata} directory.}
 }
 \value{
-An \code{sf} object containing polygons representing continents. The object includes a column for the continent names and corresponding geometries.
+An \code{sf} object with:
+\itemize{
+\item \code{continent} — continent name.
+\item \code{geometry} — polygon geometry for that continent.
+}
 }
 \description{
 This function reads a GeoJSON file from a given URL, extracts continent information, and returns an sf object with continent polygons.

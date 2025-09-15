@@ -1,36 +1,40 @@
 #' Analyze Species Convex Hulls Against Biome Data
 #'
-#' This function checks which biomes are intersected by the convex hulls of species distributions. By default, the function uses a preloaded biome shapefile containing four biomes: Humid Tropics, Dry Tropics, Temperate, and Boreal. Users can also provide their own biome data as an `sf` object.
+#' Checks which biomes are intersected by the convex hulls of species distributions.
+#' By default, uses a preloaded biome shapefile containing four biomes: 
+#' Humid Tropics, Dry Tropics, Temperate, and Boreal. 
+#' Users can optionally supply their own biome shapefile as an `sf` object.
 #'
-#' @param convex_hulls A named list of convex hulls for each species. Each element of the list should contain a list of `sf` polygon objects representing the convex hulls of species' distributions.
-#' @param biome_sf An optional `sf` object representing the biome polygons. If not provided, the default biome shapefile (`biomes.shp`) from the package will be used. The default biomes are:
-#' \itemize{
-#'   \item \strong{Humid Tropics}
-#'   \item \strong{Dry Tropics}
-#'   \item \strong{Temperate}
-#'   \item \strong{Boreal}
-#' }
-#'
-#' @return A dataframe where each row corresponds to a species, and each column (except `species_name`) represents a biome. A value of 1 in the cell indicates that the species' convex hull intersects with the respective biome.
-#'
-#' @note If the CRS of the provided `biome_sf` or `convex_hulls` is not set, the function will automatically assign and transform them to EPSG:4326 (WGS84).
+#' @param convex_hulls A named list of convex hulls for each species. 
+#'   Each element should be a list of `sf` polygon objects representing the convex hulls of a species' distribution.
 #' 
+#' @param biome_sf Optional `sf` object representing biome polygons. 
+#'   If not provided, the default biome shapefile (`biomes.shp`) included in the package will be used. Custom biome data must include a column named `"BIOME"`.
+#'
+#' @details
+#' The function ensures that both the biome data and species convex hulls 
+#' are in the EPSG:4326 (WGS84) coordinate reference system. If CRS is missing, 
+#' it is assigned automatically. Polygons are validated with `st_make_valid()` before intersection checks. 
+#' Returns a dataframe where each row corresponds to a species, and each biome column contains `1` if an intersection occurs, otherwise `0`.
+#'
+#' @return A dataframe with `species_name` and one column per biome. 
+#'   Values are `1` if the species' convex hull intersects the biome, `0` otherwise.
+#'
+#' @note Custom biome data must have a `"BIOME"` column with biome names.
+#'
 #' @examples 
-#' 
-#' # Generate a dataframe for Abies cephalonica and Abies firma
+#' # Example: Checking biome intersections for two Abies species
 #' test_data <- data.frame(species_name = c("Abies_cephalonica", "Abies_firma"))
-#' 
-#' # Get convex hulls for species' ranges 
 #' convex_hulls_abies <- get_range_convex_hulls(test_data)
-#' 
-#' # Check the biomes of Abies cephalonica and Abies firma - Abies cephalonica occurs in temperate forests while Abies firma occures in both temperate forests and humid tropics
 #' abies_biomes <- check_biomes(convex_hulls_abies)
-#' 
-#' #' @references
-#' \insertRef{Hansen2010}{GeoFunPhy}
-#' 
-#' @export
+#' print(abies_biomes)
 #'
+#' @references
+#' \insertRef{Hansen2010}{GeoFunPhy}
+#'
+#' @import sf
+#' @importFrom dplyr bind_rows
+#' @export
 check_biomes <- function(convex_hulls, biome_sf = NULL) {
   # Path to the biome shapefile within the extdata directory
   shapefile_path <- system.file("extdata", "biomes.shp", package = "GeoFunPhy")

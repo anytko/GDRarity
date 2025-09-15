@@ -71,9 +71,3 @@ test_that("clip_polygons_to_land handles convex_hulls with no intersection with 
   # Since there's no intersection, the result should be an empty list
   expect_length(result[[1]], 0)
 })
-
-
-
-
-
-

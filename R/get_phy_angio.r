@@ -2,23 +2,31 @@
 #'
 #' Retreive seed plant phylogenies described in Smith & Brown 2018 from FePhyFoFum in github
 #'
-#' @param phy_choice Choice of seed phylogeny includes ALLMB, ALLOTB, GBMB, GBOTB
+#' @param phy_choice Character string specifying which seed plant phylogeny to download. 
+#'   Must be one of:
+#'   \itemize{
+#'     \item `"ALLMB"`: GenBank and Open Tree of Life taxa with a backbone from Magallón et al. (2015)
+#'     \item `"ALLOTB"`: GenBank and Open Tree of Life taxa with a backbone from Open Tree of Life version 9.1
+#'     \item `"GBMB"`: GenBank taxa with a backbone from Magallón et al. (2015)
+#'     \item `"GBOTB"`: GenBank taxa with a backbone from Open Tree of Life version 9.1
+#'   }
 #'
-#' @details The function downloads a pre-constructed phylogenetic tree from the 'big_seed_plant_trees' repository on GitHub.
+#' @details 
+#' The function downloads a pre-constructed phylogenetic tree from the 
+#' \href{https://github.com/FePhyFoFum/big_seed_plant_trees}{big_seed_plant_trees} 
+#' GitHub repository, unzips it to a temporary directory, and reads the `.tre` file 
+#' corresponding to the selected `phy_choice`. 
 #'
-#' The available tree choices are as follows:
-#' - 'ALLMB': GenBank and Open Tree of Life taxa with a backbone provided by Magallón et al. 2015
-#' - 'ALLOTB': GenBank and Open Tree of Life taxa with a backbone provided by Open Tree of Life version 9.1
-#' - 'GBMB': GenBank taxa with a backbone provided by Magallón et al. 2015
-#' - 'GBOTB': GenBank taxa with a backbone provided by Open Tree of Life version 9.1
-#'
-#' @return A rooted phylogenetic object to be used in comparative methods
+#' @return A rooted phylogenetic tree as a `phylo` object to be used in comparative methods
 #'
 #' @import ape
+#' @importFrom utils download.file unzip
+#' @importFrom Rdpack reprompt
 #'
 #' @author Alivia G Nytko, \email{anytko@@vols.utk.edu}
 #'
 #' @examples
+#' \dontrun{
 #' ALLMB_phy <- get_phy_angio(phy_choice = "ALLMB")
 #'
 #' ALLOTB_phy <- get_phy_angio(phy_choice = "ALLOTB")
@@ -26,15 +34,12 @@
 #' GMBM_phy <- get_phy_angio(phy_choice = "GBMB")
 #'
 #' GBOTB_phy <- get_phy_angio(phy_choice = "GBOTB")
-#'
-#' @importFrom Rdpack reprompt
+#' }
 #'
 #' @references
-#' \insertRef{smithbrown2018}{GeoFunPhy}
-#'
-#' \insertRef{kleyer2008}{GeoFunPhy}
-#'
-#' \insertRef{Magallon2015}{GeoFunPhy}
+#' \insertRef{smithbrown2018}{GDRarity}
+#' \insertRef{kleyer2008}{GDRarity}
+#' \insertRef{Magallon2015}{GDRarity}
 #'
 #' @export
 #'

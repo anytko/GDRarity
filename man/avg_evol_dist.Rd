@@ -2,47 +2,71 @@
 % Please edit documentation in R/avg_evol_dist.r
 \name{avg_evol_dist}
 \alias{avg_evol_dist}
-\title{Calculate average evolutionary distinctiveness across multiple time scales}
+\title{Calculate average evolutionary distinctiveness (ED) for a set of species}
 \usage{
 avg_evol_dist(
   phy,
   data_frame,
+  species_col = "species",
   taxon = NULL,
+  time = TRUE,
   time_slices = c(25, 50, 75, 100, 115),
   num_cores = 1
 )
 }
 \arguments{
-\item{phy}{A rooted, time-calibrated (branch lengths representative of time) phylogenetic tree used to calculate evolutionary distinctiveness.}
+\item{phy}{A rooted, time-calibrated phylogenetic tree (\code{phylo} object).
+Branch lengths must reflect time (e.g., millions of years).}
 
-\item{data_frame}{A data frame containing species data with a "species_name" column.}
+\item{data_frame}{A data frame containing the species of interest. Must include a column with species names.}
 
-\item{taxon}{A character vector specifying the taxa (species) of interest. Default is NULL.}
+\item{species_col}{A character string specifying the name of the species column in data_frame. Default is "species".}
 
-\item{time_slices}{A numeric vector specifying the desired time slices to consider. Default is 25 MYA, 50 MYA, 75 MYA, 100MYA, 115MYA. These should be adjusted based on the time-extent of the phylogeny; the default times are based on a large phylogeny of Angiosperms. If the chosen time slices are not reflected on the utilized phylogeny, an error will occur.}
+\item{taxon}{Optional character vector specifying which taxa (species) to compute ED for. If NULL (default), all unique species in data_frame are used.}
 
-\item{num_cores}{Number of CPU cores to use for parallel processing. Default is 1. We recommend utilizing as many cores as possible.}
+\item{time}{Logical; if FALSE, ED is calculated across the full tree. If TRUE, ED is calculated across multiple evolutionary time slices. Default is TRUE}
+
+\item{time_slices}{Numeric vector of time depths (in millions of years ago, MYA) at which to slice the tree. Default is \code{c(25, 50, 75, 100, 115)}. Values must be less than the root age of \code{phy}. Ultrametric trees are recommended.}
+
+\item{num_cores}{Number of CPU cores to use for parallel processing. Default is 1. We recommend increasing this for faster computation.}
 }
 \value{
-A data frame with species names and their corresponding evolutionary distinctiveness values. Species not included in the phylogeny will return NA.
+A \code{data.frame} with two columns:
+\enumerate{
+\item The species column (name matches \code{species_col}).
+\item \code{ED} — the average evolutionary distinctiveness.
+}
 }
 \description{
-This function calculates the average evolutionary distinctiveness for a list of species across distinct time slices.
+Computes the average evolutionary distinctiveness (ED) of each species based on a rooted, time-calibrated phylogenetic tree. ED can be calculated either across the full tree or across multiple evolutionary time slices.
 }
 \details{
-Many species are evolutionarily distinct within genera but are evolutionarily indistinct across larger phylogenetic extents. This function accounts for differences in evolutionary distinctiveness at different time extents through the calculation of evolutionary distinctiveness at five distinct phylogenetic extents.
+Evolutionary distinctiveness (ED) is computed using the \code{"fair.proportion"}method from \strong{picante}. When \code{time = TRUE}, the phylogeny is sliced at each time depth using \code{\link[phytools:treeSlice]{phytools::treeSlice()}} and ED is computed for each slice.
+The mean ED across slices is returned for each species.
+
+Calculating ED at several evolutionary depths captures how distinct species are over deep vs. shallow time scales.
+
+Parallel processing is supported via \strong{foreach} and \strong{doParallel}.
 }
 \examples{
+# Generate a phylogeny
+set.seed(123)
+random_phy <- ape::rtree(n = 7)
+random_phy$tip.label <- c("Acer_campestre", "Acer_monspessulanum",
+                          "Acer_negundo", "Acer_opalus",
+                          "Acer_platanoides", "Acer_pseudoplatanus",
+                          "Acer_saccharinum")
 
-Import phylogeny
-GBMB_phy <- get_phy_angio(phy_choice = "GBMB")
+# Create a dataframe of species
+maple_data <- data.frame(species = random_phy$tip.label)
 
-Create dataframe with species names
-maple_data <- data.frame(species_name = c("Acer_campestre", "Acer_monspessulanum", "Acer_negundo", "Acer_opalus", "Acer_platanoides", "Acer_pseudoplatanus", "Acer_saccharinum"))
+# Compute ED using time slices
+ed_results <- avg_evol_dist(phy = random_phy,
+                            data_frame = maple_data,
+                            species_col = "species",
+                            num_cores = 1,
+                            time_slices = c(0.5, 1, 1.5))
 
-Calculate evolutionary distinctiveness through time (1MYA, 5MYA, 10MYA)
-GBMB_ED <- avg_evol_dist(phy = GBMB_phy, data_frame = maple_data, num_cores=6, time_slices = c(1,5,10))
-
-print(GBMB_ED)
+print(ed_results)
 
 }

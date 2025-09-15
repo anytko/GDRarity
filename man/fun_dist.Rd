@@ -2,27 +2,38 @@
 % Please edit documentation in R/fun_dist.r
 \name{fun_dist}
 \alias{fun_dist}
-\title{Calculate relative functional distinctiveness for species based on trait data}
+\title{Calculate Relative Functional Distinctiveness (FD) from Trait Data}
 \usage{
-fun_dist(data_frame, trait_columns)
+fun_dist(data_frame, trait_columns, species_col = "species")
 }
 \arguments{
-\item{data_frame}{A data frame containing species data with a "species_name" column.}
+\item{data_frame}{A data frame containing species data with a column of species names.}
 
-\item{trait_columns}{A character vector of trait columns used for calculating FD.}
+\item{trait_columns}{Character vector specifying the names of numeric trait columns to use for FD calculation. Must contain at least two traits.}
+
+\item{species_col}{Character string specifying the column in \code{data_frame} that contains species names. Default is \code{"species"}.}
 }
 \value{
-A data frame with species names and their functional distinctiveness (fun_dist) values.
+A \code{data.frame} with one row per species containing:
+\itemize{
+\item \code{species_col} — species name.
+\item \code{fun_dist} — functional distinctiveness value.
+}
 }
 \description{
-This function calculates relative functional distinctiveness (FD) for species based on trait data.
+Computes relative functional distinctiveness for species based on multiple traits.
+Traits are median-centered before computing pairwise Euclidean distances, and
+FD is calculated as the mean distance of each species to all others.
 }
 \details{
-This function scales trait data (by the median) found in a dataframe consiting of multiple traits (2+), computes Euclidean distances, and then calculates the relative functional distinctiveness of each species. This measure of functional distinctiveness is relative to the species analyzed, such that a species can be functionaly distinct within a small subset of species, but functionally indistinct across the larger tree of life.
+Functional distinctiveness (FD) for each species
+is calculated as the mean of its distances to all other species in the dataset.
+This is a relative measure — a species can be functionally distinct within a subset
+of species but not necessarily across all species globally.
 }
 \examples{
 
-Create a dataframe of maple species with trait data (SLA, height, seed mass)
+# Create a dataframe of maple species with trait data (SLA, height, seed mass)
 maple_data <- data.frame(species_name = c("Acer campestre", "Acer monspessulanum", "Acer negundo", "Acer opalus", "Acer platanoides", "Acer pseudoplatanus", "Acer saccharinum"), SLA = c(5, 15, 6, 11, 23.5, 52, 4), height = c(50, 65, 28, 70, 68, 43, 55), seed_mass = c(1.2, 0.57, 2, 8.5, 0.54, 2.3, 1.9))
 
 FD_results <- fun_dist(data_frame = maple_data, trait_columns = c("SLA", "height", "seed_mass"))

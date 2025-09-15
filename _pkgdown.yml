@@ -1,4 +1,15 @@
-url: https://anytko.github.io/GeoFunPhy/
+url: https://anytko.github.io/GDRarity/
+
 template:
   bootstrap: 5
+  params:
+    logo: man/figures/logo.png
 
+home:
+  title: ""
+  description: "An R package for the Global Model of Discretized Rarity"
+  readme: README.Rmd
+  
+urls:
+  reference: https://anytko.github.io/GDRarity/reference
+  article: https://anytko.github.io/GDRarity/articles

@@ -1,177 +1,85 @@
 ---
+output: github_document
 ---
 
-<!-- README.md is generated from README.Rmd. Please edit that file -->
+<p style="font-size: 2.5em; font-weight: bold; margin-bottom: 0;">
+  GDRarity <img src="man/figures/logo.png" align="right" width="120" alt="GDRarity logo"/>
+</p>
+
 
 ```{r, include = FALSE}
 knitr::opts_chunk$set(
   collapse = TRUE,
   comment = "#>",
-  fig.path = "man/figures/README-",
-  out.width = "100%"
+  fig.path = "man/figures/README-"
 )
 library(tibble)
-library(rgl)
+library(dplyr)
 ```
 
-[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.13845718.svg)](https://doi.org/10.5281/zenodo.13845718)
 
-# GeoFunPhy
+# An R package for the Global Model of Discretized Rarity
+
 
 <!-- badges: start -->
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.13845718.svg)](https://doi.org/10.5281/zenodo.13845718)
 <!-- badges: end -->
 
 ## Overview
 
-GeoFunPhy is a tool used to classify the eco-evolutionary rarity of species
-varying in geographic, phylogenetic, and functional trait rarity. The
-ecological status proposed in GeoFunPhy can be used to infer larger
-organismal strategy.
+The Global Model of Discretized Rarity (GDR) integrates geographic, functional, and phylogenetic dimensions of rarity at regional and local scales. GDRarity is an R package that characterizes the GDR and its 63 restrictions.
 
-- get_phy_angio() sources a choice of phylogeny from Smith & Brown 2018
-- build_trait_data_LEDA() constructs a dataframe of chosen functional traits from the LEDA trait database
-- calc_range_size() calculates the range size of species
-- avg_evol_dist() calculates the evolutionary distinctiveness of species
-  across distinct times and multiple phylogenetic extents
-- fun_dist() calculates functional distinctiveness (FD) for species
-  based on trait data
-- scale_by_median() scales desired data within a dataframe using median
-  z scores
-- elbow_plot() displays an elbowplot for different K means for a variable
-- compute_wcss() computes the Within-Cluster Sum of Squares (WCSS) for a given variable and a range of cluster values (k) using k-means clustering
-- define_custom_k_ranges() performs k-means clustering on a variable and define custom ranges based on cluster centers
-- check_EER_status_k() classifies the eco-evolutionary rarity (EER) of chosen species
-  within a dataframe
-- get_range_convex_hulls() creates convex hulls for a species using cleaned GBIF occurence data
-- clip_polygons_to_land() clips range convex hulls to continent boundaries
-- range_sizes() calculates the range size of clipped convex hulls
-- get_continent_sf() reads and formats a GeoJSON document with continent data
-- check_continents() checks which continents species convex hulls occur in
-- check_biomes() checks which biomes species convex hulls occur in
-- plot_convex_hulls() plots species' occurence polygons onto a world map
--plot_clipped_hulls() plots species' clipped occurence polygons (clipped to continent bounds) onto a world map
-- range_poly_map() creates and plots species' occurence polygons onto a world map 
-- plot_EER_status() visualizes eco-evolutionary rarity categories in 3D space
-- build_treemap() visualizes eco-evolutionary rarity categories using a treemap
+Its webpage is at <https://anytko.github.io/GDRarity/>; its source code is at <https://github.com/anytko/GDRarity>. 
 
 ## Installation
 
-You can install the development version of GeoFunPhy like so:
+You can install the development version of GDRarity like so:
 
-``` r 
-devtools::install_github("anytko/GeoFunPhy")
+```r 
+devtools::install_github("anytko/GDRarity")
 ```
+
+### Features
+- Automates restriction selection based on available data.
+- Characterizes the rarity of species using multiple restrictions simultaneously.
+- Tests various methods of calculating geographic, functional, and phylogenetic dimensions of rarity and rarity thresholding.
+- Analyzes restriction performance in explaining a response variable (i.e. biological processes).
+- Accepts additional, user specified dimensions of rarity to create or augment new restrictions of the GDR. 
+
+### Caveats 
+- Only pulls plant trait data from the LEDA and BIEN plant trait databases. 
+- Certain methods, such as calculating regional geographic rarity using extent of occurrence (range size) requires an internet connection and can be computationally intensive.
+- Does not incorporate Rabinowitz Rarity as a GDR restriction, but habitat specificity can be added as an additional, user specified dimension of rarity.
 
 ## Example
 
-This is a basic example which demonstrates GeoFunPhy useage and shows how you can determine the eco-evolutionary status of common tree genera using SLA, seed_mass, and canopy_height. Note that certain functions, such as those called by calc_range_size() are not included (i.e. get_range_convex_hulls() and clip_polygons_to_land()). Please see the GeoFunPhy vignette for a comprehensive example more information on extra functionality.
+The 63 restrictions of the GDR can be applied using phylogeny, species, abundance, and trait data within one function.
 
-``` {r message=FALSE, warning=FALSE}
-library(GeoFunPhy)
-```
-
-## Create Trait Dataframe
-
-``` {r Create Trait Dataframe, results='asis', eval=FALSE}
-trait_df <- build_trait_data_LEDA(columns_to_select = c("SLA", "seed_mass", "canopy_height"), genera = c("Acer_", "Pinus_", "Fraxinus_", "Quercus_", "Tsuga_", "Ulmus", "Populus", "Betula_"))
-```
-
-## Input Phylogeny
-Users can input their own phylogeny or use one of the four phylogeneies listed in Smith & Brown 2018 including: 
-
-* ALLMB: GenBank and Open Tree of Life taxa with a backbone provided by Magallón et al. 2015
-* ALLOTB: GenBank and Open Tree of Life taxa with a backbone provided by Open Tree of Life version 9.1
-* GBMB: GenBank taxa with a backbone provided by Magallón et al. 2015
-* GBOTB: GenBank taxa with a backbone provided by Open Tree of Life version 9.1"
-
-``` {r Import Phylogeny, eval=FALSE}
-GBMB_phylogeny <- get_phy_angio("GBMB")
-```
-
-## Calculate Range Sizes
-
-``` {r Calculate Range Sizes, results=FALSE, echo=TRUE, message=FALSE, eval=FALSE}
-range_sizes_df <- calc_range_size(data_frame = trait_df, num_cores = 1, gbif_limit = 2500)
-```
-
-## Plot Range Polygons
-### Plot the range polygons of a species from the table above: Acer campestre
-```{r Plot Range Polygons, message=FALSE, eval=FALSE}
-acer_campestre_range <- data.frame(species_name = c("Acer campestre"))
-
-range_poly_map(data_frame = acer_campestre_range)
-```
-
-### OR
-
-```{r Plot Range Polygons Clipped, message=FALSE, eval=FALSE}
-continent_bounds <- get_continent_sf()
-range_poly_map(data_frame = acer_campestre_range, clip = TRUE, continent_sf = continent_bounds)
-
-```
-
-## Calculate Average Evolutionary Distinctiveness
-
-``` {r Calculate Average Evolutionary Distinctiveness, results='asis', message=FALSE, warning=FALSE, eval=FALSE}
-trait_range_evol_df <- avg_evol_dist(phy = GBMB_phylogeny, data_frame = trait_df, num_cores = 6, time_slices = c(5, 10, 20, 35))
-```
-
-## Calculate Functional Distinctiveness
-In order to calculate functional distinctiveness, we need to remove any species with NA values for any trait. 
-``` {r Remove NA, results='asis', eval=FALSE}
-merged_df <- merge(merge(trait_df, range_sizes_df, by = "species_name", all = TRUE), trait_range_evol_df, by = "species_name", all = TRUE)
-
-merged_df <- na.omit(merged_df)
-```
-
-``` {r Calculate Functional Distinctiveness, results='asis', eval=FALSE}
-fun_trait_range_evol_df <- fun_dist(data_frame = merged_df, trait_columns = c("SLA", "seed_mass", "canopy_height"))
-```
-
-## Transform Dataframe Around the Median
-``` {r Z Transform Dataframe, results='asis', eval=FALSE}
-scaled_df <- scale_by_median(data_frame = fun_trait_range_evol_df, columns_chosen = c("range_size", "mean_evol_dist"))
-
-```
-
-## Create Elbow Plots to Detmine Optimal K Means
-### The optimal K means value can be determined by finding the "elbow" or bend in the plot. For example, in the three plots below a K = 3 represents the plot's elbow.
-
-``` {r Elbow Plot Range Size, fig.width = 8, fig.height = 6, eval=FALSE}
-range_elbow <- elbow_plot(data = scaled_df, variable = "range_size", k_max = 10, ggplot = TRUE)
-
-print(range_elbow)
-```
-
-``` {r Elbow Plot Evolutionary Distinctiveness, fig.width = 8, fig.height = 6, eval=FALSE}
-evol_elbow <- elbow_plot(data = scaled_df, variable = "mean_evol_dist", k_max = 10, ggplot = TRUE)
-
-print(evol_elbow)
-```
-
-``` {r Elbow Plot Functional Distinctiveness, fig.width = 8, fig.height = 6, eval=FALSE}
-fun_elbow <- elbow_plot(data = scaled_df, variable = "fun_dist", k_max = 10, ggplot = TRUE)
-
-print(fun_elbow)
+```{r message=FALSE, warning=FALSE}
+library(GDRarity)
 ```
 
 
-## Determine Eco-Evolutionary Rarity Status
-### Hint: Use the elbow plots above to determine optimal K means values
-``` {r Check Eco-evolutionary Rarity (EER) Status, results=FALSE, echo=TRUE, message=FALSE, eval=FALSE}
-eco_stat_df <- check_EER_status_k(data_frame = scaled_df, range_size_col = "range_size", mean_evol_dist_col = "mean_evol_dist", fun_dist_col = "fun_dist", range_size_k = 3, mean_evol_dist_k = 3, fun_dist_k = 3)
+```{r Run All Restrictions, echo=TRUE, eval=TRUE, message=FALSE, warning=FALSE}
+species_70_path <- system.file("extdata", "species_70.csv", package = "GDRarity")
+abundance_70_path <- system.file("extdata", "abundance_70.csv", package = "GDRarity")
+
+species_70 <- read.csv(species_70_path)
+abundance_70 <- read.csv(abundance_70_path)
+
+all_restrictions <- gdrare_pipeline(
+      species_df = species_70,
+      abundance_df = abundance_70,
+      trait_cols = c("SLA", "seed_mass", "canopy_height"),
+      geo_rarity_method = "taxonomic",
+      fun_rarity_method = "min_distance")
 ```
 
-
-## Visualizing Eco-evolutionary Rarity Status 
-
-We can map the EER of species from this dataframe onto 2D and interactive 3D space. This object can be manipulated and positioned by the user in order to best visualize the respective ecological statuses. 
-
-``` {r Create 2d Visualization, eval=FALSE}
-tree_map <- build_treemap(eco_stat_df)
-```
-
-
-``` {r Create 3d Visualization, out.width="100%", fig.dim = c(6, 6), fig.show='hide', eval=FALSE}
-figure <- plot_EER_status(data_frame = eco_stat_df, fun_dist = "fun_dist", evol_dist = "mean_evol_dist", range_size = "range_size")
+Results of Restriction GRFLPR
+```{r Select Restriction, echo=TRUE, eval=TRUE, message=FALSE, warning=FALSE}
+all_restrictions %>%
+  select(species, GR_raw, FL_raw, PR_raw, GRFLPR) %>%
+  head(6) %>%
+  mutate(across(where(is.numeric), ~ round(., 3))) %>%  
+  knitr::kable()
 ```

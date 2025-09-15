@@ -2,17 +2,26 @@
 #'
 #' This function uses a continent GeoJSON or shape file (.shp & .shx) file to clip range polygons to land boundaries.
 #'
-#' @param convex_hulls A nested list of \code{sf} objects representing the convex hulls of a species range.
-#' @param continent_sf A file of continent boundaries. We recommend using Natural Earth's GeoJSON or shape files. 
-#' @return A nested list of clipped range polygons
+#' @param convex_hulls A nested list of `sf` polygon objects representing the convex hulls 
+#'   of species ranges. Typically generated using [get_range_convex_hulls()].
+#' @param continent_sf An `sf` object containing continent polygons (e.g., from Natural Earth 
+#'   GeoJSON or shapefiles). Coordinate reference systems will be matched automatically
+#' @return A nested list of `sf` polygon objects representing the clipped species ranges. 
+#'   Each top-level list element corresponds to a species; each sublist contains one or 
+#'   more clipped polygons for that species.
 #' @import rmapshaper
 #' @import sf
-#' @details When clipping the polygons of species with no points touching land (i.e. an oceanic polygon) the function will return an error. This error has been silenced and the oceanic polygon will be removed from the clipped polygon list.
+#' @details
+#' The function sets the CRS of each input polygon to match that of `continent_sf` using 
+#' `sf::st_crs()`, then uses `rmapshaper::ms_clip()` to perform the clipping operation. 
+#' Invalid geometries are fixed with `sf::st_make_valid()`.
+#' If a species range does not intersect land (i.e., an entirely oceanic polygon), it is 
+#' removed from the output. Errors during clipping are caught and silently ignored.
 #' 
 #' @examples
-#' Generate a test dataframe with species Abies cephalonica
+#' # Generate a test dataframe with species Abies cephalonica
 #' test_data <- data.frame(species_name = c("Acer_campestre"))
-#' Retrieve the unclipped range convex hulls 
+#' # Retrieve the unclipped range convex hulls 
 #' unclipped_hulls <- get_range_convex_hulls(test_data)
 #' # Get continent data from a GeoJSON file
 #' continent_sf_example <- get_continent_sf()
@@ -20,7 +29,6 @@
 #' clipped_polygons <- clip_polygons_to_land(convex_hulls = unclipped_hulls, continent_sf = continent_sf_example)
 #' print(clipped_polygons)
 #' @export
-#' 
 clip_polygons_to_land <- function(convex_hulls, continent_sf) {
   # Check if the input is NULL
   if (is.null(convex_hulls) || length(convex_hulls) == 0) {

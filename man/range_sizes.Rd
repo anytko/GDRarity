@@ -4,13 +4,34 @@
 \alias{range_sizes}
 \title{Compute range sizes (sq km) from clipped or raw range polygons}
 \usage{
-range_sizes(clipped_polygons_list)
+range_sizes(clipped_polygons_list, species_col = "species_name")
 }
 \arguments{
-\item{clipped_polygons_list}{A list of clipped range polygons.}
+\item{clipped_polygons_list}{A named list where each element is a list of
+\code{sf} polygon objects representing the range of a species.}
+
+\item{species_col}{Character string specifying the name of the species column
+in the output. Default is \code{"species_name"}.}
+}
+\value{
+A tibble with two columns:
+\itemize{
+\item \code{species_col} — species name.
+\item \code{range_size} — total range size in square kilometers.
+}
 }
 \description{
-This function calculates the range size (sq km) of species range polygons.
+Calculates the total range size (in square kilometers) for each species
+from a list of range polygons. Can be used with polygons that have been
+clipped to land boundaries or with raw convex hull polygons.
+}
+\details{
+For each species, the function sums the areas of all polygons in
+\code{clipped_polygons_list} using \code{sf::st_area()}. Areas are returned in square
+kilometers by dividing the default square meters result by 1e6.
+
+Polygons that are invalid (\code{!st_is_valid()}) are skipped, and any errors
+during area calculation are caught and reported as warnings.
 }
 \examples{
 # Create a dataframe with a 'species_name' column

@@ -7,34 +7,38 @@
 scale_by_median(data_frame, columns_chosen = NULL)
 }
 \arguments{
-\item{data_frame}{A data frame containing the columns to transform.}
+\item{data_frame}{A data frame containing the columns to transform. Must not contain \code{NA} values.}
 
-\item{columns_chosen}{A character vector specifying the column names to transform. Default is NULL.}
+\item{columns_chosen}{A character vector specifying the names of the columns to transform. If \code{NULL} (default), all columns except \code{"species_name"} are transformed.}
 }
 \value{
-A scaled data frame with Z-scores computed using the median and medain absolute deviation (MAD) for the selected columns.
+A data frame where the selected columns have been scaled to z-scores based on the median and MAD.
 }
 \description{
-Transform values in a dataframe into z scores around the median. To classify species status, measures of range size and evolutionary distinctiveness must be tranformed.
+Transform selected columns in a data frame into z-scores centered around the median using median absolute deviation (MAD).
+This transformation is recommended when using range size and evolutionary distinctiveness for geographic and phylogenetic dimensions of rarity.
 }
 \details{
-Chosen columns are scaled using the median and median absolute deviation. This transformation is recommend for range size and evolultionary distinctiveness when classifying the ecological status of species using EcoStatusR::check_eco_status().
+This function calculates z-scores as:
+\deqn{z = (x - \text{median}(x)) / \text{MAD}(x)}
+where MAD is computed as the median of absolute deviations from the median,without applying the standard consistency constant.
+If \code{columns_chosen} is \code{NULL}, all columns except \code{"species_name"} are scaled.
 }
 \examples{
-
-Create dataframe of pine species with range sizes and evolutionary distinctiveness
-pine_names <- c("Pinus_banksiana", "Pinus_cembra", "Pinus_nigra", "Pinus_pinaster", "Pinus_pinea", "Pinus_ponderosa", "Pinus_strobus", "Pinus_sylvestris", "Pinus_uncinata")
-evol_dist_values <- runif(min = -50, max = 50, n=9)
-range_values <- runif(min = -20000, max = 20000, n=9)
-
+# Create dataframe of pine species with range sizes and evolutionary distinctiveness
+pine_names <- c("Pinus_banksiana", "Pinus_cembra", "Pinus_nigra", "Pinus_pinaster", 
+                "Pinus_pinea", "Pinus_ponderosa", "Pinus_strobus", "Pinus_sylvestris", "Pinus_uncinata")
+evol_dist_values <- runif(n = 9, min = -50, max = 50)
+range_values <- runif(n = 9, min = -20000, max = 20000)
 pine_data <- data.frame(species_name = pine_names, range_size = range_values, evol_dist = evol_dist_values)
 
+# Apply median scaling to all columns except species_name
 transform_all <- scale_by_median(data_frame = pine_data)
 print(transform_all)
 
 }
 \seealso{
-Please keep in mind that these values in the examples are randomized and therefore not representative of true ecological status.
+\code{\link[=prepare_gdrarity_axes]{prepare_gdrarity_axes()}} where it is applied internally.
 }
 \author{
 Alivia G Nytko, \email{anytko@vols.utk.edu}

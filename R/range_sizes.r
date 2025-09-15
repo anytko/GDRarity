@@ -1,9 +1,32 @@
 #' Compute range sizes (sq km) from clipped or raw range polygons
 #'
-#' This function calculates the range size (sq km) of species range polygons.
+#' Calculates the total range size (in square kilometers) for each species 
+#' from a list of range polygons. Can be used with polygons that have been 
+#' clipped to land boundaries or with raw convex hull polygons.
 #'
-#' @param clipped_polygons_list A list of clipped range polygons.
+#' @param clipped_polygons_list A named list where each element is a list of 
+#'   `sf` polygon objects representing the range of a species.
+#' @param species_col Character string specifying the name of the species column 
+#'   in the output. Default is `"species_name"`.
+#' 
+#' @details
+#' For each species, the function sums the areas of all polygons in 
+#' `clipped_polygons_list` using `sf::st_area()`. Areas are returned in square 
+#' kilometers by dividing the default square meters result by 1e6.
+#' 
+#' Polygons that are invalid (`!st_is_valid()`) are skipped, and any errors 
+#' during area calculation are caught and reported as warnings.
+#'
+#' @return A tibble with two columns:
+#'   \itemize{
+#'     \item `species_col` — species name.
+#'     \item `range_size` — total range size in square kilometers.
+#'   }
+#' 
 #' @import sf
+#' @importFrom tibble tibble
+#' @importFrom dplyr bind_rows
+#' @importFrom rlang sym
 #' 
 #' @examples
 #' # Create a dataframe with a 'species_name' column
@@ -18,49 +41,33 @@
 #' sizes <- range_sizes(clipped_polygons_list = clipped_polygon_list)
 #' @export
 #' 
-range_sizes <- function(clipped_polygons_list) {
+range_sizes <- function(clipped_polygons_list, species_col = "species_name") {
   if (is.null(clipped_polygons_list) || length(clipped_polygons_list) == 0) {
-    return(data.frame(species_name = character(), range_size = numeric(), stringsAsFactors = FALSE))
+    return(tibble::tibble(!!sym(species_col) := character(), range_size = numeric()))
   }
   
-  # Initialize a list to store area sizes for each species
-  species_range_sizes <- list()
-
-  # Iterate over each species in the clipped polygons list
-  for (species_name in names(clipped_polygons_list)) {
-    # Initialize area accumulator for this species
+  species_range_sizes <- lapply(names(clipped_polygons_list), function(sp_name) {
     total_area <- 0
+    clipped_polygons <- clipped_polygons_list[[sp_name]]
     
-    # Iterate over each clipped polygon for this species
-    clipped_polygons <- clipped_polygons_list[[species_name]]
     for (clipped_polygon in clipped_polygons) {
       tryCatch({
-        # Check if the clipped polygon is valid
-        if (st_is_valid(clipped_polygon)) {
-          # Calculate the area and add it to the total_area for this species
-          area <- st_area(clipped_polygon) / 1e6  # Convert to square kilometers
+        if (sf::st_is_valid(clipped_polygon)) {
+          area <- sf::st_area(clipped_polygon) / 1e6  # km^2
           total_area <- total_area + as.numeric(area)
         }
       }, error = function(e) {
-        # Handle invalid geometries
         warning("Error calculating area for clipped polygon: ", conditionMessage(e))
       })
     }
     
-    # Store the total area for this species in a data frame
-    species_range_sizes[[length(species_range_sizes) + 1]] <- data.frame(
-      species_name = species_name,
-      range_size = total_area,
-      stringsAsFactors = FALSE
+    tibble::tibble(
+      !!sym(species_col) := sp_name,
+      range_size = total_area
     )
-  }
+  })
   
-  # Combine the individual data frames into one
-  result_df <- do.call(rbind, species_range_sizes)
-  
-  # Reset row names to avoid species names being used as row names
-  rownames(result_df) <- NULL
-  
+  result_df <- dplyr::bind_rows(species_range_sizes)
   return(result_df)
 }
 

@@ -2,18 +2,22 @@
 #'
 #' This function reads a GeoJSON file from a given URL, extracts continent information, and returns an sf object with continent polygons.
 #'
-#' @param url Optional URL of a GeoJSON file containing country or continent data. Default is NULL - if NULL the package uses embeded continent boundaries from Natural Earth.
+#' @param url Optional URL or file path to a GeoJSON file containing country or continent data. If `NULL` (default), the function uses the embedded Natural Earth continent boundaries from the package's `extdata` directory.
 #' 
-#' @return An \code{sf} object containing polygons representing continents. The object includes a column for the continent names and corresponding geometries.
+#' @return An `sf` object with:
+#'   \itemize{
+#'     \item `continent` — continent name.
+#'     \item `geometry` — polygon geometry for that continent.
+#'   }
+#' 
 #' @import geojsonio
 #' @import sf
-#' @export
+#' 
 #' @examples
 #' # Get continent data from a GeoJSON file
 #' continent_sf <- get_continent_sf()
 #' print(continent_sf)
 #' @export
-#' 
 get_continent_sf <- function(url = NULL) {
   # Define the default path to the continent GeoJSON file in the package directory
   default_geojson_path <- system.file("extdata", "continents.geojson", package = "GeoFunPhy")
