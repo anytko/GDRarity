@@ -41,5 +41,5 @@ print(abies_biomes)
 
 }
 \references{
-\insertRef{Hansen2010}{GeoFunPhy}
+\insertRef{Hansen2010}{GDRarity}
 }

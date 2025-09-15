@@ -30,14 +30,14 @@
 #' print(abies_biomes)
 #'
 #' @references
-#' \insertRef{Hansen2010}{GeoFunPhy}
+#' \insertRef{Hansen2010}{GDRarity}
 #'
 #' @import sf
 #' @importFrom dplyr bind_rows
 #' @export
 check_biomes <- function(convex_hulls, biome_sf = NULL) {
   # Path to the biome shapefile within the extdata directory
-  shapefile_path <- system.file("extdata", "biomes.shp", package = "GeoFunPhy")
+  shapefile_path <- system.file("extdata", "biomes.shp", package = "GDRarity")
   
   # Check if the user has provided their own biome data
   if (is.null(biome_sf)) {

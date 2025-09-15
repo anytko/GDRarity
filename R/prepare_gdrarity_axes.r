@@ -28,6 +28,8 @@
 #' Default is \code{FALSE}.
 #' 
 #' @return A data frame containing species and their computed rarity dimensions, one column per axis (e.g., `"GR"`, `"FL"`, `"PR"`).
+#' 
+#' @import funrar
 #'
 #' @details
 #' The function calculates the following axes when requested and data are available:
