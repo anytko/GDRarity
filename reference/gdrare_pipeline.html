@@ -179,8 +179,14 @@
 </dl></div>
     <div class="section level2">
     <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
-    <p>A data frame with species-level rarity classifications. This includes raw values and rarity flags for each axis and rarity classifications for each restriction.</p>
-    </div>
+    <p>A list with two elements:</p><dl><dt><code>classified_df</code></dt>
+<dd><p>A data frame with species-level rarity classifications, including raw values and rarity flags for each axis and rarity classifications for each restriction.</p></dd>
+
+<dt><code>phylo</code></dt>
+<dd><p>The phylogenetic tree used in the analyses (class <code>phylo</code>).</p></dd>
+
+
+</dl></div>
     <div class="section level2">
     <h2 id="details">Details<a class="anchor" aria-label="anchor" href="#details"></a></h2>
     <p>This function is a high-level wrapper that runs the entire GDR workflow. It:</p><ol><li><p>Prepares rarity restrictions and input data.</p></li>

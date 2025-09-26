@@ -111,7 +111,7 @@ GDRarity <img src="articles/logo.png" align="right" width="120" alt="GDRarity lo
 <span>      fun_rarity_method <span class="op">=</span> <span class="st">"min_distance"</span><span class="op">)</span></span></code></pre></div>
 <p>Results of Restriction GRFLPR</p>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">all_restrictions</span> <span class="op">%&gt;%</span></span>
+<code class="sourceCode R"><span><span class="va">all_restrictions</span><span class="op">$</span><span class="va">classified_df</span> <span class="op">%&gt;%</span></span>
 <span>  <span class="fu">select</span><span class="op">(</span><span class="va">species</span>, <span class="va">GR_raw</span>, <span class="va">FL_raw</span>, <span class="va">PR_raw</span>, <span class="va">GRFLPR</span><span class="op">)</span> <span class="op">%&gt;%</span></span>
 <span>  <span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="fl">6</span><span class="op">)</span> <span class="op">%&gt;%</span></span>
 <span>  <span class="fu">mutate</span><span class="op">(</span><span class="fu">across</span><span class="op">(</span><span class="fu">where</span><span class="op">(</span><span class="va">is.numeric</span><span class="op">)</span>, <span class="op">~</span> <span class="fu"><a href="https://rdrr.io/r/base/Round.html" class="external-link">round</a></span><span class="op">(</span><span class="va">.</span>, <span class="fl">3</span><span class="op">)</span><span class="op">)</span><span class="op">)</span> <span class="op">%&gt;%</span>  </span>
