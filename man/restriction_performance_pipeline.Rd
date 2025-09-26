@@ -28,6 +28,8 @@ restriction_performance_pipeline(
   k_means = FALSE,
   additional_dimensions = NULL,
   model = NULL,
+  use_phylolm = FALSE,
+  phylolm_model = "BM",
   verbose = TRUE
 )
 }
@@ -63,6 +65,12 @@ restriction_performance_pipeline(
 \item{additional_dimensions}{Optional list of additional custom rarity axes to include in the analysis.}
 
 \item{model}{Optional specified restriction to pass through.}
+
+\item{use_phylolm}{Logical; if \code{TRUE}, fits phylogenetic linear models with
+\code{\link[phylolm]{phylolm}}. If \code{FALSE}, fits standard linear models with \code{lm}.}
+
+\item{phylolm_model}{Character string specifying the model type to pass to \code{phylolm},
+e.g. \code{"BM"} (Brownian motion).}
 
 \item{verbose}{Logical to print progress. Default is \code{TRUE}.}
 }

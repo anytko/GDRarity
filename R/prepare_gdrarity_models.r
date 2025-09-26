@@ -215,8 +215,18 @@ prepare_gdrarity_models <- function(species_df,
     })
   } else character(0)
 
+  species_df_out <- species_df  # copy to avoid editing original
+
+  if (!is.null(additional_dimensions)) {
+    custom_axis_map <- setNames(extra_axes, additional_dimensions)
+    for (orig_col in names(custom_axis_map)) {
+      new_col <- custom_axis_map[[orig_col]]
+      species_df_out[[new_col]] <- species_df_out[[orig_col]]
+    }
+  }
+
   return(invisible(list(
-    species_df = species_df,
+    species_df = species_df_out,
     abundance_df = abundance_df,
     trait_cols = if (trait_available) trait_cols else NULL,
     phylo = if (phylo_available) phylo else NULL,

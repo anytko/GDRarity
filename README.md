@@ -79,7 +79,7 @@ all_restrictions <- gdrare_pipeline(
 Results of Restriction GRFLPR
 
 ``` r
-all_restrictions %>%
+all_restrictions$classified_df %>%
   select(species, GR_raw, FL_raw, PR_raw, GRFLPR) %>%
   head(6) %>%
   mutate(across(where(is.numeric), ~ round(., 3))) %>%  

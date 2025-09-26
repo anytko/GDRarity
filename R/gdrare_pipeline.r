@@ -30,8 +30,11 @@
 #' 
 #' @param directions A named list specifying whether rarity is associated with \code{"low"} or \code{"high"} values for each dimension. If unspecified, the function defaults to \code{"low"} for \code{"GR"} and \code{"GL"}, and \code{"high"} for all other axes. Users can specify only a subset of axes to override the defaults.
 #'
-#' @return A data frame with species-level rarity classifications. This includes raw values and rarity flags for each axis and rarity classifications for each restriction.
-#'
+#' @return A list with two elements:
+#' \describe{
+#'   \item{\code{classified_df}}{A data frame with species-level rarity classifications, including raw values and rarity flags for each axis and rarity classifications for each restriction.}
+#'   \item{\code{phylo}}{The phylogenetic tree used in the analyses (class \code{phylo}).}
+#' }
 #' @details
 #' This function is a high-level wrapper that runs the entire GDR workflow. It:
 #' \enumerate{
@@ -127,5 +130,8 @@ gdrare_pipeline <- function(species_df,
   )
   
   # Return final classified dataframe (or you can also return intermediate steps)
-  return(classified_df)
+  return(list(
+  classified_df = classified_df,
+  phylo = model_info$phylo
+))
 }

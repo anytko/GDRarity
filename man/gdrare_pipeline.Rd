@@ -88,7 +88,11 @@ gdrare_pipeline(
 \item{directions}{A named list specifying whether rarity is associated with \code{"low"} or \code{"high"} values for each dimension. If unspecified, the function defaults to \code{"low"} for \code{"GR"} and \code{"GL"}, and \code{"high"} for all other axes. Users can specify only a subset of axes to override the defaults.}
 }
 \value{
-A data frame with species-level rarity classifications. This includes raw values and rarity flags for each axis and rarity classifications for each restriction.
+A list with two elements:
+\describe{
+\item{\code{classified_df}}{A data frame with species-level rarity classifications, including raw values and rarity flags for each axis and rarity classifications for each restriction.}
+\item{\code{phylo}}{The phylogenetic tree used in the analyses (class \code{phylo}).}
+}
 }
 \description{
 Runs the full global model of discretized rarity (GDR) and its restrictions for a set of species, from model preparation to rarity axis calculation to final rarity type assignment.

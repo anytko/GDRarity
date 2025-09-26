@@ -4,20 +4,51 @@
 \alias{eval_restriction_performance}
 \title{Evaluate Restriction Performance Using ANOVA}
 \usage{
-eval_restriction_performance(df_list, response_vars)
+eval_restriction_performance(
+  df_list,
+  response_vars,
+  phylo,
+  use_phylolm = TRUE,
+  phylolm_model = "BM"
+)
 }
 \arguments{
 \item{df_list}{List of data frames each containing species data and restrictions (starting after "_flag" columns).}
 
 \item{response_vars}{Character vector of response variable names to test in the linear models. Must be included in the df_list.}
+
+\item{phylo}{A phylogenetic tree of class \code{phylo}, required if \code{use_phylolm = TRUE}.}
+
+\item{use_phylolm}{Logical; if \code{TRUE}, fits phylogenetic linear models with
+\code{\link[phylolm]{phylolm}}. If \code{FALSE}, fits standard linear models with \code{lm}.}
+
+\item{phylolm_model}{Character string specifying the model type to pass to \code{phylolm},
+e.g. \code{"BM"} (Brownian motion).}
 }
 \value{
-A data frame combining ANOVA results for all models and response variables, with columns:
+A data frame combining results across all models and response variables.
+Returned columns differ depending on whether \code{use_phylolm} is \code{TRUE} or \code{FALSE}:
+
+\strong{If \code{use_phylolm = TRUE}:}
+\itemize{
+\item method: Identifier of the combo/data frame.
+\item model: Restriction name.
+\item term: Predictor variable (restriction term).
+\item response_variable: Response variable tested.
+\item estimate: Model coefficient estimate.
+\item std_error: Standard error of the estimate.
+\item p_value: p-value of the coefficient.
+\item AIC: Akaike Information Criterion value of the model.
+\item multiple_R2: Model R-squared.
+\item adjusted_R2: Adjusted R-squared.
+}
+
+\strong{If \code{use_phylolm = FALSE}:}
 \itemize{
 \item method: Identifier of the combo/data frame.
 \item model: Restriction name.
 \item response_variable: Response variable tested.
-\item AIC: Akaike Information Criterion value for the model.
+\item AIC: Akaike Information Criterion value of the model.
 \item df: Degrees of freedom used in the ANOVA.
 \item F_statistic: F statistic from the ANOVA.
 \item p_value: p-value from the ANOVA F-test.
@@ -26,8 +57,8 @@ A data frame combining ANOVA results for all models and response variables, with
 }
 }
 \description{
-Applies linear models for each restriction in a list of data frames, testing ability of restrictions to explain specified response variables.
-Extracts ANOVA statistics and model summaries.
+Applies phylogenetic linear models for each restriction in a list of data frames, testing ability of restrictions to explain specified response variables.
+Extracts phylogenetic linear model statistics and summaries.
 }
 \note{
 To run highly multidimensional models such as GDR, the number of species must outnumber the possible rarity types (i.e., at least 63 species for GDR) to ensure the linear models work correctly.

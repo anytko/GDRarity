@@ -136,55 +136,83 @@ run_all_gdrare_combos <- function(species_df,
     results[[i]] <- result
   }
   
+  phylo_out <- results[[1]]$phylo
+
   rejoined_results <- lapply(results, function(res) {
     if (is.list(res) && length(res) == 1 && is.data.frame(res[[1]])) {
-      res <- res[[1]]
+      df <- res[[1]]
+    } else {
+      df <- res$classified_df
     }
-    dplyr::left_join(species_df, res, by = species_col)
+    dplyr::left_join(species_df, df, by = species_col)
   })
   
   return(list(
     results = rejoined_results,
+    raw_results = results,
+    phylo = phylo_out,
     threshold_sets = threshold_df,
     direction_sets = direction_df,
     param_grid = param_grid
-  ))
-}
-
+  )) }
 
 
 #' Evaluate Restriction Performance Using ANOVA
 #'
-#' Applies linear models for each restriction in a list of data frames, testing ability of restrictions to explain specified response variables.
-#' Extracts ANOVA statistics and model summaries.
+#' Applies phylogenetic linear models for each restriction in a list of data frames, testing ability of restrictions to explain specified response variables.
+#' Extracts phylogenetic linear model statistics and summaries.
 #'
 #' @param df_list List of data frames each containing species data and restrictions (starting after "_flag" columns).
 #' @param response_vars Character vector of response variable names to test in the linear models. Must be included in the df_list.
+#' @param phylo A phylogenetic tree of class \code{phylo}, required if \code{use_phylolm = TRUE}.
+#' @param use_phylolm Logical; if \code{TRUE}, fits phylogenetic linear models with 
+#'   \code{\link[phylolm]{phylolm}}. If \code{FALSE}, fits standard linear models with \code{lm}.
+#' @param phylolm_model Character string specifying the model type to pass to \code{phylolm}, 
+#'   e.g. \code{"BM"} (Brownian motion).
+#' 
+#' @import phylolm
 #'
-#' @return A data frame combining ANOVA results for all models and response variables, with columns:
-#' \itemize{
-#'   \item method: Identifier of the combo/data frame.
-#'   \item model: Restriction name.
-#'   \item response_variable: Response variable tested.
-#'   \item AIC: Akaike Information Criterion value for the model.
-#'   \item df: Degrees of freedom used in the ANOVA.
-#'   \item F_statistic: F statistic from the ANOVA.
-#'   \item p_value: p-value from the ANOVA F-test.
-#'   \item multiple_R2: Multiple R-squared of the model.
-#'   \item adjusted_R2: Adjusted R-squared of the model.
-#' }
+#' @return A data frame combining results across all models and response variables. 
+#'   Returned columns differ depending on whether \code{use_phylolm} is \code{TRUE} or \code{FALSE}:
+#'
+#'   \strong{If \code{use_phylolm = TRUE}:}
+#'   \itemize{
+#'     \item method: Identifier of the combo/data frame.
+#'     \item model: Restriction name.
+#'     \item term: Predictor variable (restriction term).
+#'     \item response_variable: Response variable tested.
+#'     \item estimate: Model coefficient estimate.
+#'     \item std_error: Standard error of the estimate.
+#'     \item p_value: p-value of the coefficient.
+#'     \item AIC: Akaike Information Criterion value of the model.
+#'     \item multiple_R2: Model R-squared.
+#'     \item adjusted_R2: Adjusted R-squared.
+#'   }
+#'
+#'   \strong{If \code{use_phylolm = FALSE}:}
+#'   \itemize{
+#'     \item method: Identifier of the combo/data frame.
+#'     \item model: Restriction name.
+#'     \item response_variable: Response variable tested.
+#'     \item AIC: Akaike Information Criterion value of the model.
+#'     \item df: Degrees of freedom used in the ANOVA.
+#'     \item F_statistic: F statistic from the ANOVA.
+#'     \item p_value: p-value from the ANOVA F-test.
+#'     \item multiple_R2: Multiple R-squared of the model.
+#'     \item adjusted_R2: Adjusted R-squared of the model.
+#'   }
 #' 
 #' @note To run highly multidimensional models such as GDR, the number of species must outnumber the possible rarity types (i.e., at least 63 species for GDR) to ensure the linear models work correctly.
 #' 
 #' @export
-eval_restriction_performance <- function(df_list, response_vars) {
+#' 
+eval_restriction_performance <- function(df_list, response_vars, phylo, use_phylolm = TRUE, phylolm_model = "BM") {
   results_list <- lapply(seq_along(df_list), function(i) {
     df <- df_list[[i]]
     combo_id <- paste0("method_", i)
-    
+
     flag_cols <- grep("_flag$", colnames(df))
-    if (length(flag_cols) == 0) stop("No columns ending in '_flag' were found.")
-    
+    if (length(flag_cols) == 0) stop("No columns ending in '_flag' found")
     start_col <- max(flag_cols) + 1
     model_cols <- colnames(df)[start_col:ncol(df)]
     
@@ -192,28 +220,61 @@ eval_restriction_performance <- function(df_list, response_vars) {
     
     for (model_col in model_cols) {
       for (response in response_vars) {
+
         formula <- as.formula(paste0(response, " ~ `", model_col, "`"))
         
         tryCatch({
-          fit <- lm(formula, data = df)
-          anova_result <- anova(fit)
-          model_summary <- summary(fit)
-          
-          row <- data.frame(
-            method = combo_id,
-            model = model_col,
-            response_variable = response,
-            AIC = AIC(fit),
-            df = sum(anova_result$Df, na.rm = TRUE),
-            F_statistic = anova_result$`F value`[1],
-            p_value = anova_result$`Pr(>F)`[1],
-            multiple_R2 = model_summary$r.squared,
-            adjusted_R2 = model_summary$adj.r.squared
-          )
-          
-          df_results <- rbind(df_results, row)
+          if (use_phylolm) {
+
+            rownames(df) <- df$species
+            fit <- phylolm::phylolm(formula, data = df, phy = phylo, model = phylolm_model)
+            
+            
+            coefs <- summary(fit)$coefficients
+            p_values <- summary(fit)$coefficients[,'p.value']
+            
+            # R²
+            R2_full <- fit$r.squared
+            R2_adj <- fit$adj.r.squared
+            
+            row <- data.frame(
+              method = combo_id,
+              model = model_col,
+              term = rownames(coefs),
+              response_variable = response,
+              estimate = coefs[, "Estimate"],
+              std_error = coefs[, "StdErr"],
+              p_value = p_values,
+              AIC = AIC(fit),
+              multiple_R2 = R2_full,
+              adjusted_R2 = R2_adj
+            )
+            row <- row[row$term != "(Intercept)", ]
+            
+            df_results <- rbind(df_results, row)
+            
+          } else {
+            fit <- lm(formula, data = df)
+            model_summary <- summary(fit)
+            anova_result <- anova(fit)
+            
+            row <- data.frame(
+              method = combo_id,
+              model = model_col,
+              response_variable = response,
+              AIC = AIC(fit),
+              df = sum(anova_result$Df, na.rm = TRUE),
+              F_statistic = anova_result$`F value`[1],
+              p_value = anova_result$`Pr(>F)`[1],
+              multiple_R2 = model_summary$r.squared,
+              adjusted_R2 = model_summary$adj.r.squared
+            )
+            
+            df_results <- rbind(df_results, row)
+          }
         }, error = function(e) {
-          warning(sprintf("Failed for model %s and response %s in %s: %s", model_col, response, combo_id, e$message))
+          warning(sprintf("Failed coefficient extraction for model %s and response %s: %s",
+                          model_col, response, e$message))
         })
       }
     }
@@ -221,10 +282,9 @@ eval_restriction_performance <- function(df_list, response_vars) {
     return(df_results)
   })
   
-  # Combine all results
+  # Combine results from all dataframes
   dplyr::bind_rows(results_list)
 }
-
 
 #' Get Best Methods of Applying Each Restriction Per Response Variable Based on AIC
 #'
@@ -265,6 +325,10 @@ get_best_methods <- function(anova_df) {
 #' @param k_means Logical, whether to use k-means clustering.
 #' @param additional_dimensions Optional list of additional custom rarity axes to include in the analysis.
 #' @param model Optional specified restriction to pass through.
+#' @param use_phylolm Logical; if \code{TRUE}, fits phylogenetic linear models with 
+#'   \code{\link[phylolm]{phylolm}}. If \code{FALSE}, fits standard linear models with \code{lm}.
+#' @param phylolm_model Character string specifying the model type to pass to \code{phylolm}, 
+#'   e.g. \code{"BM"} (Brownian motion).
 #' @param verbose Logical to print progress. Default is \code{TRUE}.
 #'
 #' @return A list containing:
@@ -301,6 +365,8 @@ restriction_performance_pipeline <- function(species_df,
                                 k_means = FALSE,
                                 additional_dimensions = NULL,
                                 model = NULL,
+                                use_phylolm = FALSE,
+                                phylolm_model = "BM",
                                 verbose = TRUE) {
   
   # Run all combinations
@@ -326,7 +392,10 @@ restriction_performance_pipeline <- function(species_df,
   # Evaluate restriction performance (ANOVA etc)
   anova_results <- eval_restriction_performance(
     df_list = combos$results,
-    response_vars = response_vars
+    response_vars = response_vars,
+    phylo = combos$phylo,
+    use_phylolm = use_phylolm,
+    phylolm_model = phylolm_model
   )
   
   # Get best methods per response variable by AIC

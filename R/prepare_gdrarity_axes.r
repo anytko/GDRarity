@@ -312,6 +312,7 @@ prepare_gdrarity_axes <- function(
   if (length(list_to_merge) == 0) stop("No rarity axes were computed.")
   final_df <- purrr::reduce(list_to_merge, dplyr::full_join, by = species_col)
 
+
   # Custom axes
   standard_axes <- c("GR", "GL", "FR", "FL", "PR", "PL")
   custom_axes <- setdiff(models_to_run, standard_axes)
