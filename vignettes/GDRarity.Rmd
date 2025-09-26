@@ -21,7 +21,7 @@ img[align="right"] {
 </style>
 
 <p style="font-size: 2.5em; font-weight: bold; margin-bottom: 0;">
-  GDRarity <img src="logo.png" align="right" width="120" style="margin-top: -20px;" />
+  GDRarity <img src="logo.png" align="right" width="120"/>
 </p>
 
 ```{r, include = FALSE}
@@ -97,7 +97,7 @@ all_combinations <- restriction_performance_pipeline(species_df = species_70, ab
   )
 ```
 
-### Best Models Explaining Flowering Phenology
+### Best Restrictions Explaining Flowering Phenology
 ```{r Best Models, echo = FALSE}
   DT::datatable(
     all_combinations$best_models,
@@ -171,7 +171,7 @@ hs_combinations <- restriction_performance_pipeline(species_df = species_70_hs, 
 ```
 
 
-### Best Models with Habitat Specificity
+### Best Restrictions with Habitat Specificity
 ```{r Best Model with Habitat Specificity, echo = FALSE}
   DT::datatable(
     hs_combinations$best_models,
