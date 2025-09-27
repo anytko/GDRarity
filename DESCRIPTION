@@ -1,6 +1,6 @@
 Package: GDRarity
 Title: Implementation of the global model of discretized rarity and its restrictions
-Version: 1.0
+Version: 1.1
 Imports: Rdpack, ape, dplyr, tidyr, stringr, rgbif, rgl, magrittr, purrr, treeio, vegan, datasets, base, dbscan, foreach, doParallel, sf, tibble, utils, future, future.apply, geojsonio, ggplot2, leaflet, picante, rmapshaper, DT, phytools, treemapify, BIEN, rlang, funrar, phylolm
 RdMacros: Rdpack
 Authors@R: 
