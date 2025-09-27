@@ -8,7 +8,7 @@ GDRarity
 
 <!-- badges: start -->
 
-[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.17123096.svg)](https://doi.org/10.5281/zenodo.17123096)
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.17214385.svg)](https://doi.org/10.5281/zenodo.17214385)
 <!-- badges: end -->
 
 ## Overview
